@@ -11,6 +11,7 @@
 
 		<link rel="stylesheet" type="text/css" href="css/normalize.min.css">
 		<link rel="stylesheet" type="text/css" href="css/global.css">
+		<link rel="stylesheet" type="text/css" href="bower_components/ng-tags-input/ng-tags-input.css">
 
 	</head>
 	<body ng-controller="MyController">
@@ -21,7 +22,9 @@
 				<div class="clearfix">
 					<input type="text">
 					<ul>
-						<li>ログイン</li>
+						<li ng-if="!user.logined"><a ng-click="loginEvent(loginedCallback)">ログイン</a></li>
+						<li ng-if="user.logined"><a ng-click="newEvent()">新規作成</a></li>
+						<li ng-if="user.logined"><a ng-click="logoutEvent()">ログアウト</a></li>
 						<li>ヘルプ</li>
 					</ul>
 				</div>
@@ -29,6 +32,8 @@
 		</header>
 		
 
+		<!-- ////////////////////////////////////////////// -->
+		<!-- Lists -->
 		<div class="lists">
 			<ul>
 				<li ng-repeat="snippet in snippets">
@@ -37,9 +42,69 @@
 			</ul>
 		</div>
 
-		<div class="detail">
-			<div html="snippet.content"></div>
+
+		<!-- ////////////////////////////////////////////// -->
+		<!-- Show -->
+		<div class="snippet_detail" ng-class="editor_state">
+			<h1>{{snippet.title}}</h1>
+
+			<!-- Editable user metadata -->
+			<div ng-if="snippet.editable" class="snippet_metadata">
+				<span>あなた</span>
+				<span>{{snippet.updated_at}}</span>
+				<button ng-click="modifySnippetEvent(snippet.id)">{{modify_button_title}}</button>
+				<button 
+					ng-if="global.state.is('snippets.single.editor')" 
+					ng-click="cancelSnippetEvent(snippet.id)">
+						取り消し
+				</button>
+				<button class="destroy" ng-click="destroySnippetEvent(snippet.id)">削除</button>
+			</div>
+
+			<!-- Not-editable user metadata -->
+			<div ng-if="!snippet.editable" class="snippet_metadata">
+				<span>{{snippet.creator_name}}</span>
+				<span>{{snippet.updated_at}}</span>
+			</div>
+			<ul class="snippet_tags">
+				<li ng-repeat="_tag in snippet.tags">{{_tag.text}}</li>
+			</ul>
+			<div class="content" html="snippet.content"></div>
 		</div>
+
+
+		<!-- ////////////////////////////////////////////// -->
+		<!-- Edit -->
+		<div ng-if="global.state.is('snippets.single.editor')" class="editor" ng-controller="EditorController">
+			<div class='textbox-area'>
+				<h3>編集モード</h3>
+				<div ng-if="errors != null" class="errors-message">
+					<ul>
+						<li ng-repeat="err in errors">{{err}}</li>
+					</ul>
+				</div>
+				<div class='input-group'>
+					<label>タイトル</label>
+					<input type='text' placeholder='タイトル' name='title' ng-model="snippet.title" >
+				</div>
+				<div class='input-group'>
+					<label>内容</label>
+					<textarea name='content' ng-model="snippet.content"></textarea>
+				</div>
+				<div class='input-group'>
+					<label>タグ</label>
+					<tags-input name='tags' ng-model="snippet.tags" >
+						<auto-complete source="loadTags($query)"></auto-complete>
+					</tags-input>
+				</div>
+			</div>
+		</div>
+
+		<!-- dialog -->
+		<dialog-box ng-if="dialogBox.show" title="dialogBox.title" message="dialogBox.message">
+			<button class="btn btn-danger" ng-click="dialogBox.okButtonClickEvent()">{{dialogBox.okButtonText}}</button>
+			<button class="btn btn-primary" ng-click="dialogBox.noButtonClickEvent()">{{dialogBox.noButtonText}}</button>
+		</dialog-box>
 
 
 		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
@@ -47,6 +112,7 @@
 		<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
 		<script type="text/javascript" src="bower_components/showdown/src/showdown.js"></script>
+		<script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
 		
 		<script type="text/javascript" src="js/app.js"></script>
 		<script type="text/javascript" src="js/controllers.js"></script>

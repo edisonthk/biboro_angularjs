@@ -107,28 +107,32 @@ a {text-decoration: none;}
 }
 
 /* snippet detail */
-.detail{
+.snippet_detail{
 width:70%;height:600px;
 background-color:white;float:right;
 }
 
-.detail > * {
+.snippet_detail > * {
   margin-left: 20px;
 }
-.detail .snippet_metadata > span, .detail .snippet_metadata > button {
+.snippet_detail .snippet_metadata > span, .snippet_detail .snippet_metadata > button {
   margin-right: 7px;
 }
 
-.detail .snippet_metadata > button {
+.snippet_detail .snippet_metadata > button {
   border: 1px solid #ccc;
   padding: 5px 7px;
 }
+.snippet_detail .snippet_metadata > button.destroy {
+  background-color: rgb(155, 33, 33);
+  color: white;
+}
 
-.detail .snippet_tags {
+.snippet_detail .snippet_tags {
   margin-top: 20px;
 }
 
-.detail .snippet_tags > li {
+.snippet_detail .snippet_tags > li {
   height: auto;
   border: 0;
   padding: 7px 7px;
@@ -165,10 +169,133 @@ background-color:#ddd;}
 
 .lists{overflow: scroll;position:fixed;width:30%;top:52px;}
 
-.detail{overflow: auto;position:fixed;width:70%;top:52px;left:30%;}
+.snippet_detail {
+  overflow: auto;
+  position: fixed;
+  width: 70%;
+  top: 52px;
+  left: 30%;
+}
+.snippet_detail.editor_state {
+  left:400px;
+}
 
 
 .editor {
-  margin-top: 50px;
+  position: fixed;
+  z-index: 0;
+  min-width: 400px;
+  height: calc(100% - 52px);
+  background-color: rgba(200,200,200,0.85); 
+  margin-top: 52px;
 }
 
+.editor [name=content] {
+  width: 300px;
+  height: 300px;
+}
+
+.editor .errors-message {
+    color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.editor .errors-message ul li {
+  display: block;
+}
+.editor .errors-message ul {
+  list-style-type: disc;
+}
+
+
+
+/* Dialog CSS */ 
+dialog-box .dialog-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  z-index: 200;
+  opacity: 0.6;
+}
+
+.dialog-open {
+  /* Blur and de-color */
+    -webkit-filter: blur(5px) grayscale(50%);
+}
+
+dialog-box .dialog-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+}
+
+dialog-box .dialog {
+  position: fixed;
+  padding: 10px 50px;
+  background: white;
+  border-radius: 5px;
+  min-width: 350px;
+  max-width: 50%;
+  min-height: 180px;
+  top: calc(50% - 90px);
+  left: 50%;
+  z-index: 201;
+  margin-left: -25%;
+}
+
+dialog-box .dialog * {
+  color: #333;
+}
+
+dialog-box .dialog .error-message {
+  color: red;
+}
+
+dialog-box .dialog .dialog-message {
+  /*height: 90px;*/
+}
+
+dialog-box .dialog button.btn {
+  text-align: center;
+  min-width: 80px;
+  margin-right: 10px;
+  color: #fff;
+  margin-bottom: 10px;
+}
+dialog-box .btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+.btn-primary {
+  color: #fff;
+  background-color: #428bca;
+  border-color: #357ebd;
+}
