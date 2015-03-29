@@ -11,16 +11,20 @@
 
 		<link rel="stylesheet" type="text/css" href="css/normalize.min.css">
 		<link rel="stylesheet" type="text/css" href="css/global.css">
+
+		<link rel="stylesheet" type="text/css" href="bower_components/components-font-awesome/css/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="bower_components/ng-tags-input/ng-tags-input.css">
+		<!-- <link rel="stylesheet" type="text/css" href="bower_components/google-code-prettify/bin/prettify.min.css"> -->
+		<link rel="stylesheet" type="text/css" href="bower_components/google-code-prettify/styles/desert.css">
+		<!-- <link rel="stylesheet" type="text/css" href="bower_components/angular-social/angular-social.css"> -->
 
 	</head>
 	<body ng-controller="MyController">
 		
 		<header>
-			<div class="brand-name"><a href="#">CodeGarage</a></div>
+			<div class="brand-name"><a ui-sref="snippets">CodeGarage</a></div>
 			<div class="nav-field">
 				<div class="clearfix">
-					<input type="text">
 					<ul>
 						<li ng-if="!user.logined"><a ng-click="loginEvent(loginedCallback)">ログイン</a></li>
 						<li ng-if="user.logined"><a ng-click="newEvent()">新規作成</a></li>
@@ -35,9 +39,22 @@
 		<!-- ////////////////////////////////////////////// -->
 		<!-- Lists -->
 		<div class="lists">
+			<div class="searchbox">
+				<i ng-if="searching" class="fa fa-spinner fa-spin"></i>
+				<i ng-if="!searching" class="fa fa-search"></i>
+				<input id="searchbox_input" ng-change="searchingEvent()" type="text" ng-model="kw" />
+			</div>
 			<ul>
-				<li ng-repeat="snippet in snippets">
-					<a ui-sref="snippets.single({id:snippet.id})">{{snippet.title}}</a>
+				<li ng-repeat="_snippet in snippets" ng-class="{active: _snippet.id === selected_snippet_id}">
+					<a ui-sref="snippets.single({id:_snippet.id})">
+						<div class="index">{{$index + 1}}</div>
+						<div class="title">
+							{{_snippet.title}} <br />
+							<ul class="snippet_tags">
+								<li ng-repeat="_tag in _snippet.tags">{{_tag.name}}</li>
+							</ul>
+						</div>
+					</a>
 				</li>
 			</ul>
 		</div>
@@ -45,39 +62,63 @@
 
 		<!-- ////////////////////////////////////////////// -->
 		<!-- Show -->
-		<div class="snippet_detail" ng-class="editor_state">
+		<div class="snippet_detail notfound" ng-if="snippet == null">
+			<h1>Not found</h1>
+		</div>
+		<div class="snippet_detail" ng-if="snippet != null" ng-class="{editor_state: isEditorPage()}">
+
 			<h1>{{snippet.title}}</h1>
+
+			<ul class="snippet_tags">
+				<li ng-repeat="_tag in snippet.tags">{{_tag.text}}</li>
+			</ul>
 
 			<!-- Editable user metadata -->
 			<div ng-if="snippet.editable" class="snippet_metadata">
-				<span>あなた</span>
-				<span>{{snippet.updated_at}}</span>
-				<button ng-click="modifySnippetEvent(snippet.id)">{{modify_button_title}}</button>
-				<button 
-					ng-if="global.state.is('snippets.single.editor')" 
-					ng-click="cancelSnippetEvent(snippet.id)">
-						取り消し
-				</button>
-				<button class="destroy" ng-click="destroySnippetEvent(snippet.id)">削除</button>
+				<span><i class="fa fa-pencil-square-o fa-lg"></i>あなた</span>
+				<span><i class="fa fa-clock-o fa-lg"></i>{{snippet.updated_at}}</span>
+
+				<!-- スニペット更新 -->
+				<div class="btn-group" ng-if="!global.state.is('snippets.new')" >
+					<button ng-click="modifySnippetEvent(snippet.id)">{{modify_button_title}}</button>
+					<button ng-if="global.state.is('snippets.single.editor')" ng-click="cancelSnippetEvent(snippet.id)">取り消し</button>
+					<button class="destroy" ng-click="destroySnippetEvent(snippet.id)">削除</button>
+				</div>
+
+				<div class="btn-group" ng-if="global.state.is('snippets.new')">
+					<button ng-click="createSnippetEvent()">新規作成</button>
+					<button ng-click="cancelSnippetEvent()">取り消し</button>
+				</div>
+
+				<span class="split"></span>
+
+				<share title="snippet.title" description="minify(snippet.content)"></share>
 			</div>
 
 			<!-- Not-editable user metadata -->
 			<div ng-if="!snippet.editable" class="snippet_metadata">
 				<span>{{snippet.creator_name}}</span>
 				<span>{{snippet.updated_at}}</span>
+
 			</div>
-			<ul class="snippet_tags">
-				<li ng-repeat="_tag in snippet.tags">{{_tag.text}}</li>
-			</ul>
+
+			<div></div>
+			
 			<div class="content" html="snippet.content"></div>
 		</div>
 
 
 		<!-- ////////////////////////////////////////////// -->
 		<!-- Edit -->
-		<div ng-if="global.state.is('snippets.single.editor')" class="editor" ng-controller="EditorController">
+		<div 
+			ng-class="{show: isEditorPage()}"
+			ng-controller="EditorController"
+			class="editor" >
 			<div class='textbox-area'>
-				<h3>編集モード</h3>
+
+				<h3 ng-if="global.state.is('snippets.single.editor')">編集モード</h3>
+				<h3 ng-if="global.state.is('snippets.new')">新規作成モード</h3>
+
 				<div ng-if="errors != null" class="errors-message">
 					<ul>
 						<li ng-repeat="err in errors">{{err}}</li>
@@ -89,7 +130,7 @@
 				</div>
 				<div class='input-group'>
 					<label>内容</label>
-					<textarea name='content' ng-model="snippet.content"></textarea>
+					<editor uploaded-callback="fileUploadedCallback" ng-model="snippet.content"></editor>
 				</div>
 				<div class='input-group'>
 					<label>タグ</label>
@@ -100,11 +141,21 @@
 			</div>
 		</div>
 
+		<!-- ////////////////////////////////////////////// -->
 		<!-- dialog -->
 		<dialog-box ng-if="dialogBox.show" title="dialogBox.title" message="dialogBox.message">
-			<button class="btn btn-danger" ng-click="dialogBox.okButtonClickEvent()">{{dialogBox.okButtonText}}</button>
-			<button class="btn btn-primary" ng-click="dialogBox.noButtonClickEvent()">{{dialogBox.noButtonText}}</button>
+			<button 
+				class="btn btn-danger" 
+				ng-click="dialogBox.okButtonClickEvent()">
+					{{dialogBox.okButtonText}}
+			</button>
+			<button 
+				class="btn btn-primary" 
+				ng-click="dialogBox.noButtonClickEvent()">
+					{{dialogBox.noButtonText}}
+			</button>
 		</dialog-box>
+
 
 
 		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
@@ -113,6 +164,11 @@
 		<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
 		<script type="text/javascript" src="bower_components/showdown/src/showdown.js"></script>
 		<script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
+		<script type="text/javascript" src="bower_components/angular-social/src/scripts/00-directive.js"></script>
+		<script type="text/javascript" src="bower_components/angular-social/src/scripts/02-facebook.js"></script>
+		<script type="text/javascript" src="bower_components/angular-social/src/scripts/03-twitter.js"></script>
+		<script type="text/javascript" src="bower_components/angular-social/src/scripts/04-google-plus.js"></script>
+		<script type="text/javascript" src="bower_components/google-code-prettify/bin/prettify.min.js"></script>
 		
 		<script type="text/javascript" src="js/app.js"></script>
 		<script type="text/javascript" src="js/controllers.js"></script>

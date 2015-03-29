@@ -6,13 +6,16 @@ angular.module('app.controllers',[])
 		scope.global = {};
 		scope.global.state = state;
 
-
+		// 
+		// initial several variables
 		scope.snippets = Snippet.query();
 		scope.modify_button_title = "編集";
 		scope.flag_editing = false;
 		scope.errors = null;
 		scope.snippet = initialSnippet();
 		scope.user = User;
+		state.previous = null;
+		scope.searching = false;
 		
 
 		// $scope.$watch(function(){
@@ -21,26 +24,50 @@ angular.module('app.controllers',[])
 		// 	console.log($scope.kw);
 		// });
 		scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
-			if(toParams.id){
+			state.previous = fromState;
 
-				if(isEditorPage()){
+			if(toParams.id){
+				scope.selected_snippet_id = toParams.id;
+
+				if(scope.isEditorPage()){
 					// 
-					// state: editor page
-					// =========================
+					// state: editor page for modify snippet
+					// ===========================================
 					scope.errors = null;
 					scope.modify_button_title = "更新";
-					scope.editor_state = 'editor_state';
+					
 				}else{
 					scope.modify_button_title = "編集";
-					scope.editor_state = '';
+					
 				}
 				// 
 				// state: snippets.single
 				// =========================
 				Snippet.get({snippetId: toParams.id}, function(data) {
 					scope.snippet = filterServerSnippet( data );
+				}, function() {
+					// failed to retrieve snippet
+					scope.snippet = null;
 				});
 
+			}else{
+
+				// scope.snippet = null;
+
+				if(scope.isEditorPage()) {
+					// 
+					// state: editor page for create new snippet
+					// ===========================================
+					scope.errors = null;
+					scope.modify_button_title = "新規";
+
+					// 
+					scope.snippet = initialSnippet();
+					scope.snippet.editable = true;
+					scope.snippet.updated_at = "作成中...";
+
+					console.log(scope.snippet);
+				}
 			}
 		});
 
@@ -53,15 +80,77 @@ angular.module('app.controllers',[])
 		};
 
 		scope.loadTags = function(q){
+			return [
+				{text: 'zz'},
+				{text: 'zc'}
+			];
+		};
 
+		var searching_offset_timeout;
+		scope.searchingEvent = function() {
+			if(scope.kw && scope.kw.length > 0){
+				scope.searching = true;
+
+				if(scope.kw.match(/^[0-9]+$/)) {
+					var _index = parseInt(scope.kw);
+					if(_index < scope.snippets.length) {
+						scope.selected_snippet_id = scope.snippets[_index-1].id;
+					}
+				}
+				
+				searching_offset_timeout = setTimeout(function() {
+					scope.searching = false;
+
+					if(scope.kw.match(/^[0-9]+$/)) {
+						var _index = parseInt(scope.kw);
+						if(_index < scope.snippets.length) {
+							state.go('snippets.single',{id: scope.snippets[_index-1].id} );
+						}
+					}
+
+					scope.$apply();
+				}, 500);
+			}
+		};
+
+
+		scope.createSnippetEvent = function() {
+			// new snippet
+			
+			var _tags = [];
+			for (var i = 0; i < scope.snippet.tags.length; i++) {
+				_tags.push(scope.snippet.tags[i].text);
+			};
+
+			var _data = {
+				title: scope.snippet.title,
+				content: scope.snippet.content,
+				tags: _tags,
+			};
+
+			Snippet.create({}, _data , function(results) {
+				// new snippet is successfully created
+				scope.snippets.push(results);
+				state.go('snippets.single',{id: results.id});
+
+			}, function(results) {
+				scope.errors = [];
+				for(var type in results.data.error) {
+					scope.errors.push(results.data.error[type][0]);
+				}
+			});
 		};
 
 		scope.cancelSnippetEvent  = function(snippet_id) {
-			state.go('snippets.single',{id: snippet_id});
+			if(typeof snippet_id === 'undefined') {
+				state.go('snippets');
+			}else{
+				state.go('snippets.single',{id: snippet_id});
+			}
 		};
 
 		scope.modifySnippetEvent = function(snippet_id) {
-			if(isEditorPage()) {
+			if(scope.isEditorPage()) {
 				// save
 
 				var _tags = [];
@@ -88,8 +177,6 @@ angular.module('app.controllers',[])
 					for(var type in results.data.error) {
 						scope.errors.push(results.data.error[type][0]);
 					}
-
-					console.log(err);
 				});
 
 			}else{
@@ -97,7 +184,11 @@ angular.module('app.controllers',[])
 			}
 		};
 
-		scope
+		scope.newEvent = function() {
+			// snippetを新規作成
+			// "New Snippet" button is clicked and ready for new snippet
+			state.go('snippets.new');
+		};
 
 		scope.logoutCallback = function() {
 			// when logout event is successfully carried out
@@ -124,7 +215,13 @@ angular.module('app.controllers',[])
 
 						scope.snippet = initialSnippet();
 						scope.dialogBox.show = false;
-						state.go('snippets');
+
+						if(state.previous != null){
+							state.go(state.previous);
+						}else{
+							state.go('snippets');
+						}
+						
 
 					}, function(e){
 						// failed to delete snippet
@@ -140,15 +237,102 @@ angular.module('app.controllers',[])
 		
 		};
 
+		// enter key is pressed and following event will be fired when keyup
+		// and if current keywords is not number(Which used as selecting snippet) and empty
+		// the keywords will be stored to historyKwsManager. 
+		// After that, scope.kw will be clear.
+		var historyKwsManager = [];
+		var current_selected_history_keywords = -1;
+		var enterKeyUpCallback = function() {
+			if(scope.kw.length > 0 && scope.kw.match(/^[0-9]+$/g)){
+				historyKwsManager.push(scope.kw);
+				current_selected_history_keywords = historyKwsManager.length - 1;
+			}
+			scope.kw = "";
+		};
+
+
+		var searchbox_input = document.getElementById("searchbox_input");
+		var searchbox_flag = false;
+		var _current_pre_ele = 0;
+		searchbox_input.addEventListener('focus', function(e) {
+			searchbox_flag = true;
+		});
+		searchbox_input.addEventListener('blur', function(e) {
+			searchbox_flag = false;
+		});
+		window.addEventListener('keydown', function(e) {
+
+			if(!scope.isEditorPage()){
+				// 
+				// 
+				var keyPressed = e.keyCode;
+
+				console.log(keyPressed);
+
+				if( ( keyPressed >= KeyEvent.KEY_0 && keyPressed <= KeyEvent.KEY_9 ) || 
+					( !(e.ctrlKey || e.metaKey) && keyPressed >= KeyEvent.KEY_A && keyPressed <= KeyEvent.KEY_Z )
+					|| keyPressed == 219 || keyPressed == 221 ){
+					searchbox_input.focus();
+				}else if(keyPressed == KeyEvent.KEY_ESC){
+					searchbox_input.blur();
+				}else if( (e.ctrlKey || e.metaKey) && !searchbox_flag && keyPressed == KeyEvent.KEY_A){
+					e.preventDefault();
+					
+					var _body = document.querySelector(".snippet_detail .content");
+					if(_body){
+						var _elements = _body.getElementsByTagName("pre");
+						if(_elements && _elements.length > 0){
+								
+							if(_current_pre_ele >= _elements.length){
+								_current_pre_ele = 0;
+							}
+							highlightText(_elements[_current_pre_ele]);
+							_current_pre_ele ++;
+						
+						}
+					}
+				}
+			}
+		});
+		window.addEventListener('keyup', function(e) {
+			if(!scope.isEditorPage()) {
+				var keyPressed = e.keyCode;
+				if(keyPressed == KeyEvent.KEY_ENTER) {
+					enterKeyUpCallback();
+				}
+			}
+			scope.$apply();
+		});
+		
+
 		scope.loginEvent = loginEvent;
 
-		var isEditorPage = function() {
+		scope.isEditorPage = function() {
 			return state.is('snippets.single.editor') || state.is('snippets.new');
 		};
 
+		scope.minify = minifyContent;
+
 	}])
-	.controller('EditorController', ['$scope','Snippet',function(scope, Snippet){
-		// console.log(scope.snippet);
+	.controller('EditorController', ['$scope',function(scope){
+		scope.fileUploadedCallback = function(success, msg, httpCode ) {
+			console.log(msg);
+			if(Array.isArray(msg)){
+				scope.errors = [];
+				for (var i = 0; i < msg.length; i++) {
+					if(!msg[i].success){
+						scope.errors.push(msg[i].errors);
+					}
+				};
+			}else{
+				if(!msg.success) {
+					scope.errors = [msg.errors];
+				}	
+			}
+			
+		};
+		
 	}]);
 
 // convert datatype stored in database to client AngularJS
@@ -160,6 +344,14 @@ var filterServerSnippet = function(_snippet) {
 	_snippet.tags = _tags;
 
 	return _snippet;
+}
+
+var minifyContent = function(content) {
+	return content.substr(0, 200).replace(/```/g,'').replace(/    /g,'');
+};
+
+var searchingEvent = function(query) {
+
 }
 
 var loginIntervalId;
@@ -208,10 +400,6 @@ var loginEvent = function(cb) {
 	}, 1000);
 };
 
-var logoutEvent = function(cb) {
-
-};
-
 var initialSnippet = function() {
 	return {
 		title: "",
@@ -220,10 +408,22 @@ var initialSnippet = function() {
 	};
 }
 
-var modifySnippetEvent = function(snippet_id) {
+var highlightText = function(element) {			  
+	var selection = window.getSelection();
+	var range = document.createRange();
+	range.selectNodeContents(element);
+	selection.removeAllRanges();
+	selection.addRange(range);
+	var top = element.offsetTop - (window.innerHeight / 2 );
+	window.scrollTo( 0, top );
+}
 
-};
+var KeyEvent = {
+		KEY_0 : 48,
+		KEY_9 : 57,
+		KEY_A : 65,
+		KEY_Z : 90,
+		KEY_ESC : 27,
+		KEY_ENTER : 13
+	};
 
-var destroySnippetEvent = function(snippet_id) {
-
-};
