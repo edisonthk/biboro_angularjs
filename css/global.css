@@ -260,39 +260,84 @@ margin-top:50px;display:block;
 }
 
 .editor .errors-message {
-    color: #a94442;
+  color: #a94442;
   background-color: #f2dede;
   border-color: #ebccd1;
+  margin-top: 10px;
 }
 
 .editor .errors-message ul li {
-  display: block;
+  display: list-item;
 }
 .editor .errors-message ul {
+  padding: 10px 10px 10px 20px;
+  margin: 0;
   list-style-type: disc;
 }
 
-.editor editor textarea {
-  width: 300px;
-  height: 300px;
+.editor .textbox-area{
+  margin: 0 5px;
+}
+.editor h3 {
+  font-size: 22px;
+  font-weight: 200;
+}
+.editor .input-group {
+  margin-top: 10px;  
+}
+.editor .input-group:first-child {
+  margin-top: 30px;
+}
+.editor .input-group label {
+  font-weight: bold;
+  display: block;
+  font-size: 15px;
+}
+.editor .input-group tags-input .host {
+  margin: 0;
+
+}
+.editor .input-group editor {
+  display: block;
+}
+.editor .input-group input, .editor .input-group tags-input,.editor .input-group editor, .editor .errors-message {
+  width: calc(100% - 8px);
+  padding: 3px;
+  font-size: 13px;
+}
+.editor .input-group input {
+  width: calc(100% - 17px);
+  margin-left: 3px;
+}
+.editor .input-group editor{
+  width: calc(100% - 15px);
+} 
+
+editor .clearfix, editor textarea {
+  width: 100%;
+}
+editor textarea {
+  height: 400px;
+  resize: vertical;
 }
 
-.editor .cover {
+
+editor .cover {
   border: 5px dashed #66A6CF; 
   background-color: white;
   z-index: 999;
   position: absolute;
-  width: 296px;
-  height: 296px;
+  width: calc(100% - 29px);
+  height: 400px;
   vertical-align: middle;
   text-align: center;
-  line-height: 290px;
+  line-height: 400px;
   display: none;
 }
-.editor .cover:hover {
+editor .cover:hover {
   display: block;
 }
-.editor .cover > div {
+editor .cover > div {
   display: inline-block;
   font-size: 20px;
   color: #ccc;
@@ -481,5 +526,13 @@ dialog-box .btn {
   }
   .snippet_detail > * {
     margin: 0 55px;
+  }
+  .snippet_detail.editor_state {
+    left: 550px;
+    width: calc(100% - 550px);
+  }
+  .editor {
+    width: 550px;
+    left: -550px;
   }
 }

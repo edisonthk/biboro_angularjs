@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('app.controllers',[])
-	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','$http','Snippet','User',function(scope, rootScope, state, stateParams,Http ,Snippet,User){
+	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','$http','Snippet','User','toaster',
+	function(scope, rootScope, state, stateParams,Http ,Snippet,User, Toaster){
 
 		scope.global = {};
 		scope.global.state = state;
@@ -17,6 +18,15 @@ angular.module('app.controllers',[])
 		state.previous = null;
 		scope.searching = false;
 		
+		setTimeout(function() {
+			Toaster.pop({
+				type: 'error',
+                title: 'Title text',
+                body: 'Body text',
+                showCloseButton: true
+			});
+			scope.$apply();
+		}, 3000);
 
 		// $scope.$watch(function(){
 		// 	return $scope.kw;
@@ -317,7 +327,7 @@ angular.module('app.controllers',[])
 
 				}else if( isKeyPressed(e,true, KeyEvent.KEY_A) && !searchbox_flag ){
 					e.preventDefault();
-					
+					// highlight code in snippet_detail (page in right hand side)
 					var _body = document.querySelector(".snippet_detail .content");
 					if(_body){
 						var _elements = _body.getElementsByTagName("pre");
@@ -331,6 +341,22 @@ angular.module('app.controllers',[])
 						
 						}
 					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_E)) {
+					e.preventDefault();
+					if(scope.snippet != null){
+						state.go('snippets.single.editor',{id: scope.snippet.id});
+					}
+				}
+			}else {
+				// 
+				// Handle several shortcut at editor page 
+				if( isKeyPressed(e,true, KeyEvent.KEY_S) ) {
+					e.preventDefault();
+					// Cmd + S
+					// saving
+					scope.modifySnippetEvent(scope.snippet.id);
+				}else if( isKeyPressed(e, false, KeyEvent.KEY_ESC)) {
+					e.preventDefault();
 				}
 			}
 		});
@@ -496,6 +522,30 @@ var KeyEvent = {
 		KEY_0 : 48,
 		KEY_9 : 57,
 		KEY_A : 65,
+		KEY_B : 66,
+		KEY_C : 67,
+		KEY_D : 68,
+		KEY_E : 69,
+		KEY_F : 70,
+		KEY_G : 71,
+		KEY_H : 72,
+		KEY_I : 73,
+		KEY_J : 74,
+		KEY_K : 75,
+		KEY_L : 76,
+		KEY_M : 77,
+		KEY_N : 78,
+		KEY_O : 79,
+		KEY_P : 80,
+		KEY_Q : 81,
+		KEY_R : 82,
+		KEY_S : 83,
+		KEY_T : 84,
+		KEY_U : 85,
+		KEY_V : 86,
+		KEY_W : 87,
+		KEY_X : 88,
+		KEY_Y : 89,
 		KEY_Z : 90,
 		KEY_ESC : 27,
 		KEY_ENTER : 13,

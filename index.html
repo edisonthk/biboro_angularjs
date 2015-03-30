@@ -17,7 +17,7 @@
 		<!-- <link rel="stylesheet" type="text/css" href="bower_components/google-code-prettify/bin/prettify.min.css"> -->
 		<link rel="stylesheet" type="text/css" href="bower_components/google-code-prettify/styles/desert.css">
 		<!-- <link rel="stylesheet" type="text/css" href="bower_components/angular-social/angular-social.css"> -->
-
+		<link rel="stylesheet" type="text/css" href="bower_components/angularjs-toaster/toaster.min.css">
 	</head>
 	<body ng-controller="MyController">
 		
@@ -116,9 +116,7 @@
 			class="editor" >
 			<div class='textbox-area'>
 
-				<h3 ng-if="global.state.is('snippets.single.editor')">編集モード</h3>
-				<h3 ng-if="global.state.is('snippets.new')">新規作成モード</h3>
-
+				
 				<div ng-if="errors != null" class="errors-message">
 					<ul>
 						<li ng-repeat="err in errors">{{err}}</li>
@@ -129,14 +127,14 @@
 					<input type='text' placeholder='タイトル' name='title' ng-model="snippet.title" >
 				</div>
 				<div class='input-group'>
-					<label>内容</label>
-					<editor uploaded-callback="fileUploadedCallback" ng-model="snippet.content"></editor>
-				</div>
-				<div class='input-group'>
 					<label>タグ</label>
 					<tags-input name='tags' ng-model="snippet.tags" >
 						<auto-complete source="loadTags($query)"></auto-complete>
 					</tags-input>
+				</div>
+				<div class='input-group'>
+					<label>内容</label>
+					<editor uploaded-callback="fileUploadedCallback" ng-model="snippet.content"></editor>
 				</div>
 			</div>
 		</div>
@@ -156,11 +154,12 @@
 			</button>
 		</dialog-box>
 
+		<toaster-container toaster-options="{'position-class': 'toast-bottom-center'}"></toaster-container>
+
 
 
 		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
-		<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
 		<script type="text/javascript" src="bower_components/showdown/src/showdown.js"></script>
 		<script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
@@ -169,6 +168,8 @@
 		<script type="text/javascript" src="bower_components/angular-social/src/scripts/03-twitter.js"></script>
 		<script type="text/javascript" src="bower_components/angular-social/src/scripts/04-google-plus.js"></script>
 		<script type="text/javascript" src="bower_components/google-code-prettify/bin/prettify.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular-animate/angular-animate.min.js"></script>
+		<script type="text/javascript" src="bower_components/angularjs-toaster/toaster.min.js"></script>
 		
 		<script type="text/javascript" src="js/app.js"></script>
 		<script type="text/javascript" src="js/controllers.js"></script>
