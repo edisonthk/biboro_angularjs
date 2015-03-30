@@ -92,17 +92,20 @@ angular.module('app.controllers',[])
 			if(kw && kw.length > 0){
 				scope.searching = true;
 
+				// 
 				if(kw.match(/^[0-9]+$/)) {
 					var _index = parseInt(kw)-1;
 					if(_index < scope.snippets.length) {
 						scope.selected_snippet_id = scope.snippets[_index].id;
 					}
 				}
+
+
 				clearTimeout(searching_offset_timeout);
 				searching_offset_timeout = setTimeout(function() {
-					scope.searching = false;
 
 					if(kw.match(/^[0-9]+$/)) {
+						scope.searching = false;
 						// if kw is number, do "selecting"
 						var _index = parseInt(kw) - 1;
 						if(_index < scope.snippets.length) {
