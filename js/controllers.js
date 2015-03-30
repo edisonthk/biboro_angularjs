@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('app.controllers',[])
-	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','Snippet','User',function(scope, rootScope, state, stateParams, Snippet,User){
+	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','$http','Snippet','User',function(scope, rootScope, state, stateParams,Http ,Snippet,User){
 
 		scope.global = {};
 		scope.global.state = state;
@@ -79,41 +79,46 @@ angular.module('app.controllers',[])
 			}
 		};
 
-		scope.loadTags = function(q){
-			return [
-				{text: 'zz'},
-				{text: 'zc'}
-			];
+		scope.loadTags = function(query){
+			return Http.get('/json/tag/?q='+encodeURIComponent(query));
 		};
 
 		var searching_offset_timeout;
 		scope.searchingEvent = function() {
+			var kw = scope.kw;
 			// when there is change in searchbox, 
 			// reset the current index history keywords
 			reset_current_index_history_keywords();
-
-			if(scope.kw && scope.kw.length > 0){
+			if(kw && kw.length > 0){
 				scope.searching = true;
 
-				if(scope.kw.match(/^[0-9]+$/)) {
-					var _index = parseInt(scope.kw);
+				if(kw.match(/^[0-9]+$/)) {
+					var _index = parseInt(kw)-1;
 					if(_index < scope.snippets.length) {
-						scope.selected_snippet_id = scope.snippets[_index-1].id;
+						scope.selected_snippet_id = scope.snippets[_index].id;
 					}
 				}
-				
+				clearTimeout(searching_offset_timeout);
 				searching_offset_timeout = setTimeout(function() {
 					scope.searching = false;
 
-					if(scope.kw.match(/^[0-9]+$/)) {
-						var _index = parseInt(scope.kw);
+					if(kw.match(/^[0-9]+$/)) {
+						// if kw is number, do "selecting"
+						var _index = parseInt(kw) - 1;
 						if(_index < scope.snippets.length) {
-							state.go('snippets.single',{id: scope.snippets[_index-1].id} );
+							state.go('snippets.single',{id: scope.snippets[_index].id} );
 						}
+					}else{
+						// if kw not is number, do "searching"
+						Http.get('/json/search?kw='+encodeURIComponent(kw)).success(function(data) {
+							scope.snippets = data;
+							scope.searching = false;
+							// $scope.last_searched_keywords = $scope.textbox.keywords;
+						});
 					}
 
 					scope.$apply();
-				}, 500);
+				}, 300);
 			}
 		};
 
@@ -250,7 +255,7 @@ angular.module('app.controllers',[])
 		var enterKeyUpCallback = function() {
 			if(scope.kw.length > 0 && !scope.kw.match(/^[0-9]+$/g)){
 				historyKwsManager.push(scope.kw);
-				reset_current_index_history_keywords();
+				scope.searchingEvent();
 			}
 			scope.kw = "";
 		};
