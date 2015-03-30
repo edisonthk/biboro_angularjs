@@ -88,6 +88,10 @@ angular.module('app.controllers',[])
 
 		var searching_offset_timeout;
 		scope.searchingEvent = function() {
+			// when there is change in searchbox, 
+			// reset the current index history keywords
+			reset_current_index_history_keywords();
+
 			if(scope.kw && scope.kw.length > 0){
 				scope.searching = true;
 
@@ -244,11 +248,15 @@ angular.module('app.controllers',[])
 		var historyKwsManager = [];
 		var current_selected_history_keywords = -1;
 		var enterKeyUpCallback = function() {
-			if(scope.kw.length > 0 && scope.kw.match(/^[0-9]+$/g)){
+			if(scope.kw.length > 0 && !scope.kw.match(/^[0-9]+$/g)){
 				historyKwsManager.push(scope.kw);
-				current_selected_history_keywords = historyKwsManager.length - 1;
+				reset_current_index_history_keywords();
 			}
 			scope.kw = "";
+		};
+
+		var reset_current_index_history_keywords = function() {
+			current_selected_history_keywords = historyKwsManager.length - 1;
 		};
 
 
@@ -265,18 +273,41 @@ angular.module('app.controllers',[])
 
 			if(!scope.isEditorPage()){
 				// 
+				// Handler several shortcut on snippet view page
+				// such as /snippet or /snippet/:snippetId page
 				// 
-				var keyPressed = e.keyCode;
+				// In this page, 
 
-				console.log(keyPressed);
-
-				if( ( keyPressed >= KeyEvent.KEY_0 && keyPressed <= KeyEvent.KEY_9 ) || 
-					( !(e.ctrlKey || e.metaKey) && keyPressed >= KeyEvent.KEY_A && keyPressed <= KeyEvent.KEY_Z )
-					|| keyPressed == 219 || keyPressed == 221 ){
+				if( isKeyPressed(e,false, KeyEvent.KEY_0_9) || 
+					isKeyPressed(e,false, KeyEvent.KEY_A_Z) ){
+					// focus to searchbox input
 					searchbox_input.focus();
-				}else if(keyPressed == KeyEvent.KEY_ESC){
+				}else if( isKeyPressed(e,false, KeyEvent.KEY_ESC)){
+					// blur focus from searchbox input
 					searchbox_input.blur();
-				}else if( (e.ctrlKey || e.metaKey) && !searchbox_flag && keyPressed == KeyEvent.KEY_A){
+				}else if( isKeyPressed(e,false, KeyEvent.KEY_UP)) {
+					e.preventDefault();
+
+					// move to most recent history item
+					var _c = current_selected_history_keywords;
+					if(_c >= 0) {
+						scope.kw = historyKwsManager[_c];
+						_c -- ;
+						current_selected_history_keywords = _c;
+					}
+
+				}else if( isKeyPressed(e, false, KeyEvent.KEY_DOWN)) {
+					e.preventDefault();
+
+					// move to history item just read
+					var _c = current_selected_history_keywords;
+					if(_c < historyKwsManager.length - 1) {
+						_c ++ ;
+						scope.kw = historyKwsManager[_c];
+						current_selected_history_keywords = _c;
+					}
+
+				}else if( isKeyPressed(e,true, KeyEvent.KEY_A) && !searchbox_flag ){
 					e.preventDefault();
 					
 					var _body = document.querySelector(".snippet_detail .content");
@@ -347,12 +378,8 @@ var filterServerSnippet = function(_snippet) {
 }
 
 var minifyContent = function(content) {
-	return content.substr(0, 200).replace(/```/g,'').replace(/    /g,'');
+	return content.substr(0, 200).replace(/```/g,'').replace(/    /g,'') + " ...";
 };
-
-var searchingEvent = function(query) {
-
-}
 
 var loginIntervalId;
 var loginEvent = function(cb) {
@@ -418,12 +445,54 @@ var highlightText = function(element) {
 	window.scrollTo( 0, top );
 }
 
+var isKeyPressed = function(_event, meta_key, key) {
+	var e = _event;
+	var keyPressed = e.keyCode;
+
+	// kp is flag to check if correct meta key is used or not
+	// if meta_key is true, but ctrlKey or metaKey is not detect, kp will set to false
+	// if meta_key is false, but ctrlKey or metaKey is detect, kp will also set to false
+	var kp = false;
+	if(meta_key) {
+		if(e.ctrlKey || e.metaKey){
+			kp = true;
+		}
+	}else{
+		if(!(e.ctrlKey || e.metaKey)){
+			kp = true;
+		}
+	}
+
+
+	// if meta_key and userKey is matching, kp will be set as true
+	// for more detail about kp, check it out above
+	if(kp) {
+		if(key === KeyEvent.KEY_0_9 && keyPressed >= KeyEvent.KEY_0 && keyPressed <= KeyEvent.KEY_9){
+			// key => [0-9]
+			return true;
+		}else if(key === KeyEvent.KEY_A_Z && keyPressed >= KeyEvent.KEY_A && keyPressed <= KeyEvent.KEY_Z) {
+			// key => [A-Z]    
+			return true;
+		}else if(key ==  keyPressed ) {
+			// other
+			return true;
+		}
+
+	}
+	return false;
+}
+
 var KeyEvent = {
+		KEY_0_9 : -10,
+		KEY_A_Z : -9,
 		KEY_0 : 48,
 		KEY_9 : 57,
 		KEY_A : 65,
 		KEY_Z : 90,
 		KEY_ESC : 27,
-		KEY_ENTER : 13
+		KEY_ENTER : 13,
+		KEY_UP: 38,
+		KEY_DOWN: 40,
+
 	};
 
