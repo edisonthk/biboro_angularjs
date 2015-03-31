@@ -12,6 +12,7 @@
     "components-font-awesome": "~4.3.0",
     "angular-social": "esvit/angular-social#master",
     "google-code-prettify": "~1.0.4",
-    "angularjs-toaster": "~0.4.11"
+    "angularjs-toaster": "~0.4.11",
+    "angular-sanitize": "~1.3.15"
   }
 }

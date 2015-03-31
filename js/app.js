@@ -1,6 +1,6 @@
 
 
-angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster'])
+angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize'])
 
 	.config(['$locationProvider','$stateProvider', '$urlRouterProvider',function($locationProvider,$stateProvider, $urlRouterProvider){
 
@@ -12,7 +12,7 @@ angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.ser
 				url: "snippet/new"
 			})
 			.state('snippets.single',{
-				url: "snippet/:id"
+				url: "snippet/{id:[0-9]+}"
 			})
 			.state('snippets.single.editor',{
 				url: "/edit"

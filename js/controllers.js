@@ -1,11 +1,13 @@
 'use strict';
 
 angular.module('app.controllers',[])
-	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','$http','Snippet','User','toaster',
-	function(scope, rootScope, state, stateParams,Http ,Snippet,User, Toaster){
+	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','$http','Snippet','User','toaster','Feedback',
+	function(scope, rootScope, state, stateParams,Http ,Snippet,User, Toaster, Feedback){
 
 		scope.global = {};
 		scope.global.state = state;
+
+		var symbol_cmd = "⌘";
 
 		// 
 		// initial several variables
@@ -15,25 +17,25 @@ angular.module('app.controllers',[])
 		scope.errors = null;
 		scope.snippet = initialSnippet();
 		scope.user = User;
+		scope.symbol_cmd = symbol_cmd;
 		state.previous = null;
 		scope.searching = false;
 		
-		setTimeout(function() {
-			Toaster.pop({
-				type: 'error',
-                title: 'Title text',
-                body: 'Body text',
-                showCloseButton: true
-			});
-			scope.$apply();
-		}, 3000);
-
 		// $scope.$watch(function(){
 		// 	return $scope.kw;
 		// }, function() {
 		// 	console.log($scope.kw);
 		// });
 		scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+			
+			// if wrong pathing, correct the redirect. 
+			if(state.is('snippets.single')){
+				if(toParams.id.length <= 0) {
+					state.go('snippets');
+					return; 
+				}
+			}
+
 			state.previous = fromState;
 
 			if(toParams.id){
@@ -44,10 +46,10 @@ angular.module('app.controllers',[])
 					// state: editor page for modify snippet
 					// ===========================================
 					scope.errors = null;
-					scope.modify_button_title = "更新";
+					scope.modify_button_title = "更新 <small>"+symbol_cmd+"+S</small>";
 					
 				}else{
-					scope.modify_button_title = "編集";
+					scope.modify_button_title = "編集 <small>"+symbol_cmd+"+E</small>";
 					
 				}
 				// 
@@ -69,16 +71,144 @@ angular.module('app.controllers',[])
 					// state: editor page for create new snippet
 					// ===========================================
 					scope.errors = null;
-					scope.modify_button_title = "新規";
-
-					// 
+					
 					scope.snippet = initialSnippet();
 					scope.snippet.editable = true;
-					scope.snippet.updated_at = "作成中...";
+					scope.snippet.updated_at = "";
 
 					console.log(scope.snippet);
 				}
 			}
+		});
+
+		var searchbox_input = document.getElementById("searchbox_input");
+		var searchbox_flag = false;
+		var _current_pre_ele = 0;
+		searchbox_input.addEventListener('focus', function(e) {
+			searchbox_flag = true;
+		});
+		searchbox_input.addEventListener('blur', function(e) {
+			searchbox_flag = false;
+		});
+		window.addEventListener('keydown', function(e) {
+
+			if(scope.dialogBox && scope.dialogBox.show) {
+				//
+				// When dialogBox is showing
+				if( isKeyPressed(e, false, KeyEvent.KEY_ESC)){
+					e.preventDefault();
+					scope.dialogBox.show = false;
+				}	
+			}else if(!scope.isEditorPage()){
+				// 
+				// Handler several shortcut on snippet view page
+				// such as /snippet or /snippet/:snippetId page
+				// 
+				// In this page, 
+
+				if( isKeyPressed(e,false, KeyEvent.KEY_0_9) || 
+					isKeyPressed(e,false, KeyEvent.KEY_A_Z) ){
+					// focus to searchbox input
+					searchbox_input.focus();
+				}else if( isKeyPressed(e,false, KeyEvent.KEY_ESC)){
+					// blur focus from searchbox input
+					searchbox_input.blur();
+				}else if( isKeyPressed(e,false, KeyEvent.KEY_UP)) {
+					e.preventDefault();
+
+					// move to most recent history item
+					var _c = current_selected_history_keywords;
+					if(_c >= 0) {
+						scope.kw = historyKwsManager[_c];
+						_c -- ;
+						current_selected_history_keywords = _c;
+					}
+
+				}else if( isKeyPressed(e, false, KeyEvent.KEY_DOWN)) {
+					e.preventDefault();
+
+					// move to history item just read
+					var _c = current_selected_history_keywords;
+					if(_c < historyKwsManager.length - 1) {
+						_c ++ ;
+						scope.kw = historyKwsManager[_c];
+						current_selected_history_keywords = _c;
+					}
+
+				}else if( isKeyPressed(e,true, KeyEvent.KEY_A) && !searchbox_flag ){
+					e.preventDefault();
+					// highlight code in snippet_detail (page in right hand side)
+					var _body = document.querySelector(".snippet_detail .content");
+					if(_body){
+						var _elements = _body.getElementsByTagName("pre");
+						if(_elements && _elements.length > 0){
+								
+							if(_current_pre_ele >= _elements.length){
+								_current_pre_ele = 0;
+							}
+							highlightText(_elements[_current_pre_ele]);
+							_current_pre_ele ++;
+						
+						}
+					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_E)) {
+					e.preventDefault();
+					if(scope.snippet != null){
+						state.go('snippets.single.editor',{id: scope.snippet.id});
+					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
+					//
+					// When user is able to modify the current snippet and able to delete it
+					// allow user to using Cmd + DEL to delete current snippet 
+					e.preventDefault();
+					if(scope.snippet.editable) {
+						scope.destroySnippetEvent(scope.snippet.id);	
+					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_B)) {
+					e.preventDefault();
+					if( User.logined ) {
+						state.go('snippets.new');
+					}else{
+						Toaster.pop({
+							type: 'error',
+							body: '新規作成はログインしてから作成です',
+						})
+					}
+				}
+			}else {
+				// 
+				// Handle several shortcut at editor page 
+				if( isKeyPressed(e,true, KeyEvent.KEY_S) ) {
+					e.preventDefault();
+					// Cmd + S
+					// saving
+					if(state.is("snippets.new")) {
+						scope.createSnippetEvent();
+					}else{
+						scope.modifySnippetEvent(scope.snippet.id);	
+					}
+					
+				}else if( isKeyPressed(e, false, KeyEvent.KEY_ESC)) {
+					// ESC
+					// Quit editor mode
+					e.preventDefault();
+					state.go('snippets.single',{id: scope.snippet.id});
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
+					e.preventDefault();
+					if(scope.snippet.editable) {
+						scope.destroySnippetEvent(scope.snippet.id);	
+					}
+				}
+			}
+		});
+		window.addEventListener('keyup', function(e) {
+			if(!scope.isEditorPage()) {
+				var keyPressed = e.keyCode;
+				if(keyPressed == KeyEvent.KEY_ENTER) {
+					enterKeyUpCallback();
+				}
+			}
+			scope.$apply();
 		});
 
 		scope.loginedCallback = function(results) {
@@ -156,6 +286,7 @@ angular.module('app.controllers',[])
 				state.go('snippets.single',{id: results.id});
 
 			}, function(results) {
+
 				scope.errors = [];
 				for(var type in results.data.error) {
 					scope.errors.push(results.data.error[type][0]);
@@ -186,12 +317,24 @@ angular.module('app.controllers',[])
 					tags: _tags,
 				};
 
+				Toaster.pop({
+					type: 'info',
+	                body: '保存中 ...',
+	                showCloseButton: true
+				});
+				
+
 				Snippet.update({snippetId: snippet_id}, _data, function(results) {
 				
 					scope.errors = null;
 					scope.snippet = filterServerSnippet(results);
 					state.go('snippets.single',{id: snippet_id});	
-				
+					
+					Toaster.pop({
+						type: 'success',
+		                body: '保存しました',
+		                showCloseButton: true
+					});
 					
 				}, function(results){
 					// failed to update
@@ -226,10 +369,11 @@ angular.module('app.controllers',[])
 
 			scope.dialogBox = {
 				show: true,
-				okButtonText: "削除",
-				noButtonText: "キャンセル",
-				title: "削除",
-				message: "\""+scope.snippet.title+"\"を削除しますか？この動作は戻せないのでご注意ください。",
+				type: 'delete',
+				title: "<i class='fa fa-trash'></i> 削除",
+				message: "<strong>\""+scope.snippet.title+"\"</strong> を削除しますか？この動作は戻せないのでご注意ください。",
+				okButtonText: "削除 <small>"+symbol_cmd+"+DEL</small>",
+				noButtonText: "キャンセル <small>ESC</small>",
 				okButtonClickEvent: function() {
 					Snippet.delete({snippetId: scope.snippet.id}, {} , function(){
 						// success to delete snippet
@@ -259,6 +403,36 @@ angular.module('app.controllers',[])
 		
 		};
 
+		scope.feedbackEvent = function() {
+			scope.dialogBox = {
+				show: true,
+				type: 'feedback',
+				okButtonText: "送信",
+				feedback: true,
+				noButtonText: "キャンセル",
+				title: '<i class="fa fa-user"></i> フィードバック',
+				message: "テキストボックスに意見を記入して頂いて、送信ボタンを押してください。",
+				error_message: null,
+				feedback_message: '',
+				okButtonClickEvent: function() {
+					if(scope.dialogBox.feedback_message.length > 0){
+						Feedback.send({message: scope.dialogBox.feedback_message});
+						scope.dialogBox.show=false;
+						Toaster.pop({
+							type: 'success',
+			                body: 'ご意見ありがとうございます！',
+			                showCloseButton: true
+						});
+					}else{
+						scope.dialogBox.error_message = 'テキストボックスにご記入ください。';
+					}
+				},
+				noButtonClickEvent: function() {
+					scope.dialogBox.show = false;
+				},
+			}
+		}
+
 		// enter key is pressed and following event will be fired when keyup
 		// and if current keywords is not number(Which used as selecting snippet) and empty
 		// the keywords will be stored to historyKwsManager. 
@@ -276,99 +450,6 @@ angular.module('app.controllers',[])
 		var reset_current_index_history_keywords = function() {
 			current_selected_history_keywords = historyKwsManager.length - 1;
 		};
-
-
-		var searchbox_input = document.getElementById("searchbox_input");
-		var searchbox_flag = false;
-		var _current_pre_ele = 0;
-		searchbox_input.addEventListener('focus', function(e) {
-			searchbox_flag = true;
-		});
-		searchbox_input.addEventListener('blur', function(e) {
-			searchbox_flag = false;
-		});
-		window.addEventListener('keydown', function(e) {
-
-			if(!scope.isEditorPage()){
-				// 
-				// Handler several shortcut on snippet view page
-				// such as /snippet or /snippet/:snippetId page
-				// 
-				// In this page, 
-
-				if( isKeyPressed(e,false, KeyEvent.KEY_0_9) || 
-					isKeyPressed(e,false, KeyEvent.KEY_A_Z) ){
-					// focus to searchbox input
-					searchbox_input.focus();
-				}else if( isKeyPressed(e,false, KeyEvent.KEY_ESC)){
-					// blur focus from searchbox input
-					searchbox_input.blur();
-				}else if( isKeyPressed(e,false, KeyEvent.KEY_UP)) {
-					e.preventDefault();
-
-					// move to most recent history item
-					var _c = current_selected_history_keywords;
-					if(_c >= 0) {
-						scope.kw = historyKwsManager[_c];
-						_c -- ;
-						current_selected_history_keywords = _c;
-					}
-
-				}else if( isKeyPressed(e, false, KeyEvent.KEY_DOWN)) {
-					e.preventDefault();
-
-					// move to history item just read
-					var _c = current_selected_history_keywords;
-					if(_c < historyKwsManager.length - 1) {
-						_c ++ ;
-						scope.kw = historyKwsManager[_c];
-						current_selected_history_keywords = _c;
-					}
-
-				}else if( isKeyPressed(e,true, KeyEvent.KEY_A) && !searchbox_flag ){
-					e.preventDefault();
-					// highlight code in snippet_detail (page in right hand side)
-					var _body = document.querySelector(".snippet_detail .content");
-					if(_body){
-						var _elements = _body.getElementsByTagName("pre");
-						if(_elements && _elements.length > 0){
-								
-							if(_current_pre_ele >= _elements.length){
-								_current_pre_ele = 0;
-							}
-							highlightText(_elements[_current_pre_ele]);
-							_current_pre_ele ++;
-						
-						}
-					}
-				}else if( isKeyPressed(e, true, KeyEvent.KEY_E)) {
-					e.preventDefault();
-					if(scope.snippet != null){
-						state.go('snippets.single.editor',{id: scope.snippet.id});
-					}
-				}
-			}else {
-				// 
-				// Handle several shortcut at editor page 
-				if( isKeyPressed(e,true, KeyEvent.KEY_S) ) {
-					e.preventDefault();
-					// Cmd + S
-					// saving
-					scope.modifySnippetEvent(scope.snippet.id);
-				}else if( isKeyPressed(e, false, KeyEvent.KEY_ESC)) {
-					e.preventDefault();
-				}
-			}
-		});
-		window.addEventListener('keyup', function(e) {
-			if(!scope.isEditorPage()) {
-				var keyPressed = e.keyCode;
-				if(keyPressed == KeyEvent.KEY_ENTER) {
-					enterKeyUpCallback();
-				}
-			}
-			scope.$apply();
-		});
 		
 
 		scope.loginEvent = loginEvent;
@@ -418,7 +499,7 @@ var minifyContent = function(content) {
 var loginIntervalId;
 var loginEvent = function(cb) {
 	
-	var win = window.open("/account/signin", "_blank", "width=800, height=600,modal=yes");
+	var win = window.open("/account/signin", "_blank", "width=300, height=400,modal=yes");
 	loginIntervalId = setInterval(function() {
 		try{
 			var url = win.document.URL;
@@ -458,7 +539,7 @@ var loginEvent = function(cb) {
 		}catch(err){
 			console.log(err);
 		}
-	}, 1000);
+	}, 2000);
 };
 
 var initialSnippet = function() {
@@ -551,6 +632,6 @@ var KeyEvent = {
 		KEY_ENTER : 13,
 		KEY_UP: 38,
 		KEY_DOWN: 40,
-
+		KEY_DEL: 8,
 	};
 

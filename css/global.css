@@ -34,6 +34,7 @@ pre{
 }
 
 .clearfix { display: inline-block; } 
+.hide {display: none;}
 
 .brand-name a {
   text-decoration: none;
@@ -47,6 +48,8 @@ pre{
   display:inline-block;
   text-align:center;
   vertical-align:top;
+  position: fixed;
+  z-index: 2;
 }
 
 .brand-name, .lists {
@@ -63,9 +66,9 @@ pre{
 	line-height:50px;
 }
 .nav-field {
+  margin-left: 280px;
   width:calc(100% - 286px);
   position: relative;
-  left: -6px;
   height:50px;
   display:inline-block;
   /*border-bottom:2px solid rgb(3, 156, 250);
@@ -104,7 +107,7 @@ a {text-decoration: none;}
 /* snippet detail */
 .snippet_detail{
   overflow: auto;
-  position: fixed;
+  position: relative;
   top: 52px;
   bottom: 0;
 }
@@ -165,6 +168,9 @@ margin-top:50px;display:block;
 
 .nav-field ul{text-align:right;}
 
+.lists {
+  z-index: 2;
+}
 .lists ul li{
   width: 100%; 
   border: none;
@@ -244,7 +250,8 @@ margin-top:50px;display:block;
 }
 .editor {
   position: fixed;
-  z-index: 0;
+  z-index: 3;
+  top: 0;
   width: 430px;
   left: -430px;
   height: 100%;
@@ -379,14 +386,13 @@ dialog-box .dialog {
   min-width: 350px;
   max-width: 50%;
   min-height: 180px;
-  top: calc(50% - 90px);
+  top: calc(50% - 150px);
   left: 50%;
   z-index: 201;
   margin-left: -25%;
 }
-
-dialog-box .dialog * {
-  color: #333;
+dialog-box .dialog small {
+  color: inherit;  
 }
 
 dialog-box .dialog .error-message {
@@ -396,12 +402,17 @@ dialog-box .dialog .error-message {
 dialog-box .dialog .dialog-message {
   /*height: 90px;*/
 }
-
+dialog-box textarea {
+  display: block;
+  margin-bottom: 10px;
+  width: 80%;
+  height: 100px;
+  font-size: 15px;
+}
 dialog-box .dialog button.btn {
   text-align: center;
   min-width: 80px;
   margin-right: 10px;
-  color: #fff;
   margin-bottom: 10px;
 }
 dialog-box .btn {
@@ -415,13 +426,20 @@ dialog-box .btn {
   white-space: nowrap;
   vertical-align: middle;
   cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  background-image: none;
-  border: 1px solid transparent;
+  border-width: 1px;
+  border-style: solid;
   border-radius: 4px;
+}
+dialog-box .error {
+  color: red;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.btn-default {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
 }
 
 .btn-danger {
@@ -434,6 +452,11 @@ dialog-box .btn {
   background-color: #428bca;
   border-color: #357ebd;
 }
+.btn-info {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #46b8da;
+}
 
 /* Theme color & styles */
 .brand-name , .lists{
@@ -444,6 +467,10 @@ dialog-box .btn {
 }
 .lists .searchbox {
   background-color: #666;
+}
+.lists .searchbox .fa.ng-enter, .lists .searchbox .fa.ng-leave{
+  animation:0s linear all;
+  -webkit-animation: 0s linear all;
 }
 .snippet_detail {
   margin-top: 10px;
@@ -468,8 +495,7 @@ dialog-box .btn {
 }
 .snippet_detail .content pre{
   padding: 10px;
-  font-size:12px;
-  min-height:200px;
+  font-size:14px;
   margin: 0;
   overflow: auto;
   word-wrap: break-word;
@@ -523,6 +549,7 @@ dialog-box .btn {
 
   .nav-field {
     width:calc(100% - 371px);
+    margin-left: 360px;
   }
   .snippet_detail > * {
     margin: 0 55px;

@@ -51,8 +51,8 @@ angular.module('app.directives',[])
 				'<div class="dialog-background"></div>'+
 				'<div class="dialog">'+
 					'<div class="dialog-message">'+
-						'<h3>{{title}}</h3>'+
-						'<p>{{message}}</p>'+
+						'<h3 ng-bind-html="title"></h3>'+
+						'<p ng-bind-html="message"></p>'+
 					'</div>'+
 					'<ng-transclude></ng-transclude>' +
 				'</div>',

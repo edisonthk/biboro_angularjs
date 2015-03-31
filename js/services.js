@@ -16,6 +16,11 @@ angular.module('app.services', ['ngResource'])
         });
 
     }])
+    .factory('Feedback', ['$resource', function($resource){
+      return $resource('/json/feedback', {}, {
+        send: {method: 'POST'}
+      });
+    }])
     .factory('User', ['$http', function($http) {
 
       this._load = function() {
