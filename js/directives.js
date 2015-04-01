@@ -6,13 +6,16 @@
 var prettify = function(converter) {
         return [
             { type: 'output', filter: function(source){
-                return source.replace(/(<pre>)?<code>/gi, function(match, pre) {
+
+                source = source.replace(/(<pre>)?<code>/gi, function(match, pre) {
                     if (pre) {
                         return '<pre class="prettyprint"><code>';
                     } else {
                         return '<code class="prettyprint">';
                     }
                 });
+
+                return source;
             }}
         ];
     };
@@ -24,15 +27,30 @@ var Converter = new Showdown.converter({ extensions: [prettify] });
 
 
 angular.module('app.directives',[])
-	.directive('html', function ($compile) {
+	.directive('markdown', function ($compile) {
 	  return {
 	    restrict: 'A',
 	    replace: true,
 	    link: function (scope, ele, attrs) {
-	      scope.$watch(attrs.html, function(html) {
-	        ele.html(Converter.makeHtml(html));
+	      scope.$watch(attrs.markdown, function(markdown) {
+
+	      	// filter '>', '<'
+	      	markdown = markdown
+	      		.replace(/</g,'&lt;')
+	      		.replace(/>/g,'&gt;')
+	      		.replace(/```\n?(.*?)\n?```/g, function(match, code) {
+	      			console.log(match);
+	      			return match.replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+	      		})
+	      		.replace(/&gt; /g,'> ');
+
+	      	// convert markdown to html
+	        ele.html(Converter.makeHtml(markdown));
 	        $compile(ele.contents())(scope);
+
+	        // prettify code
 	        prettyPrint();
+
 	      });
 	    }
 	  };
@@ -44,7 +62,7 @@ angular.module('app.directives',[])
 			scope: {
 				title: '=',
 				message: '=',
-
+				outsideClickedEvent: '=',
 			},
 			transclude: true, 
 			template: 
@@ -67,6 +85,12 @@ angular.module('app.directives',[])
 	   //              });
 				// });
 
+				document.querySelector(".dialog-background").addEventListener('click',function(e) {
+					if(typeof scope.outsideClickedEvent === 'function') {
+						scope.outsideClickedEvent();
+						scope.$apply();
+					}
+				});
 				
 			}
 		}

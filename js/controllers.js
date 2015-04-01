@@ -28,6 +28,8 @@ angular.module('app.controllers',[])
 		// });
 		scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
 			
+			
+
 			// if wrong pathing, correct the redirect. 
 			if(state.is('snippets.single')){
 				if(toParams.id.length <= 0) {
@@ -36,7 +38,12 @@ angular.module('app.controllers',[])
 				}
 			}
 
-			state.previous = fromState;
+			if(fromState.name.length > 0){
+				state.previous = {name: fromState.name, params: fromParams};
+			}else{
+				state.previous = null;
+			}
+			
 
 			if(toParams.id){
 				scope.selected_snippet_id = toParams.id;
@@ -75,8 +82,6 @@ angular.module('app.controllers',[])
 					scope.snippet = initialSnippet();
 					scope.snippet.editable = true;
 					scope.snippet.updated_at = "";
-
-					console.log(scope.snippet);
 				}
 			}
 		});
@@ -152,6 +157,10 @@ angular.module('app.controllers',[])
 						}
 					}
 				}else if( isKeyPressed(e, true, KeyEvent.KEY_E)) {
+
+					// Move to edit page
+					// When user is able to modify current selected snippet, Cmd + E will allow user to
+					// move to editor page to modify current selected snippet.					
 					e.preventDefault();
 					if(scope.snippet != null){
 						state.go('snippets.single.editor',{id: scope.snippet.id});
@@ -191,9 +200,17 @@ angular.module('app.controllers',[])
 				}else if( isKeyPressed(e, false, KeyEvent.KEY_ESC)) {
 					// ESC
 					// Quit editor mode
+					// If current page is snippets.new page, go to previous state
+					// else if current page is snippets.single.edit page, go to snippets.single page
 					e.preventDefault();
-					state.go('snippets.single',{id: scope.snippet.id});
+					if(state.is('snippets.new')) {
+						scope.goToPreviousState();
+					}else{
+						state.go('snippets.single',{id: scope.snippet.id});
+					}
 				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
+					// Cmd + DEL
+					// 
 					e.preventDefault();
 					if(scope.snippet.editable) {
 						scope.destroySnippetEvent(scope.snippet.id);	
@@ -213,7 +230,12 @@ angular.module('app.controllers',[])
 
 		scope.loginedCallback = function(results) {
 			if(results.error) {
-				// show error message
+				// failed to login due to 
+				Toaster.pop({
+					type: 'info',
+	                body: '保存中 ...',
+	                showCloseButton: true
+				});
 			}else{
 				location.reload();
 			}
@@ -365,6 +387,15 @@ angular.module('app.controllers',[])
 			User.logout(scope.logoutCallback);
 		};
 
+		scope.goToPreviousState = function() {
+			if(state.previous != null){
+				state.go(state.previous.name, state.previous.params);
+				state.previous = null;
+			}else{
+				state.go('snippets');
+			}
+		}
+
 		scope.destroySnippetEvent = function(snippet_id) {
 
 			scope.dialogBox = {
@@ -382,12 +413,7 @@ angular.module('app.controllers',[])
 						scope.snippet = initialSnippet();
 						scope.dialogBox.show = false;
 
-						if(state.previous != null){
-							state.go(state.previous);
-						}else{
-							state.go('snippets');
-						}
-						
+						scope.goToPreviousState();
 
 					}, function(e){
 						// failed to delete snippet
@@ -431,7 +457,23 @@ angular.module('app.controllers',[])
 					scope.dialogBox.show = false;
 				},
 			}
-		}
+		};
+
+		scope.openMarkdownManual = function() {
+			scope.dialogBox = {
+				show: true,
+				type: 'markdown_help',
+				feedback: true,
+				noButtonText: "閉じる",
+				title: '<i class="fa fa-question-circle"></i> マニュアル',
+				noButtonClickEvent: function() {
+					console.log("fsdfsdfs");
+					scope.dialogBox.show = false;
+				},
+			}
+
+			scope.dialogBox.outsideClickedEvent = scope.dialogBox.noButtonClickEvent;
+		};
 
 		// enter key is pressed and following event will be fired when keyup
 		// and if current keywords is not number(Which used as selecting snippet) and empty
@@ -462,6 +504,14 @@ angular.module('app.controllers',[])
 
 	}])
 	.controller('EditorController', ['$scope',function(scope){
+
+		var input_element = document.querySelector(".editor .input-group input");
+		console.log(input_element);
+
+		if(input_element != null) {
+			input_element.focus();
+		}
+
 		scope.fileUploadedCallback = function(success, msg, httpCode ) {
 			console.log(msg);
 			if(Array.isArray(msg)){

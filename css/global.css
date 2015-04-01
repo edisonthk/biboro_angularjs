@@ -20,9 +20,30 @@ header > * {
 input:focus {
   outline: 0;
 }
-pre{
-  background-color:#e0e0e0;
+code{
+  display: inline;
 }
+pre code {
+  display: block;
+}
+pre code, code {
+  color: #fff;
+  background-color:#333;
+}
+
+/* prettify dessert theme */
+code .str { color: #ffa0a0 } /* string  - pink */
+code .kwd { color: #f0e68c; font-weight: bold }
+code .com { color: #87ceeb } /* comment - skyblue */
+code .typ { color: #98fb98 } /* type    - lightgreen */
+code .lit { color: #cd5c5c } /* literal - darkred */
+code .pun { color: #fff }    /* punctuation */
+code .pln { color: #fff }    /* plaintext */
+code .tag { color: #f0e68c; font-weight: bold } /* html/xml tag    - lightyellow */
+code .atn { color: #bdb76b; font-weight: bold } /* attribute name  - khaki */
+code .atv { color: #ffa0a0 } /* attribute value - pink */
+code .dec { color: #98fb98 } /* decimal         - lightgreen */
+
 
 .clearfix:after {
   content: "."; 
@@ -91,6 +112,7 @@ pre{
 
 .nav-field ul li a, .nav-field ul li button {
   padding-top: 10px;
+  font-size: 14px;
   top: 50%;
   text-decoration: none;
   text-align: center;
@@ -205,6 +227,7 @@ margin-top:50px;display:block;
   margin: 0 5px 6px 40px;
   display: inline-block;
   min-height: 47px;
+  font-size: 14px;
   width: calc(100% - 45px);
   color: #dddddd;
 }
@@ -302,7 +325,14 @@ margin-top:50px;display:block;
 }
 .editor .input-group tags-input .host {
   margin: 0;
-
+}
+.editor .input-group .markdown-help {
+  float: right;
+  color: blue;
+  font-weight: normal;
+}
+.editor .input-group .markdown-help a:hover {
+  cursor: pointer;
 }
 .editor .input-group editor {
   display: block;
@@ -310,7 +340,10 @@ margin-top:50px;display:block;
 .editor .input-group input, .editor .input-group tags-input,.editor .input-group editor, .editor .errors-message {
   width: calc(100% - 8px);
   padding: 3px;
-  font-size: 13px;
+  font-size: 14px;
+}
+.editor .input-group input:focus {
+  outline: initial;
 }
 .editor .input-group input {
   width: calc(100% - 17px);
@@ -351,6 +384,22 @@ editor .cover > div {
   line-height: 1.5;
 }
 
+.markdown_help th,.markdown_help td{
+  text-align: left;
+  width: 167px;
+  padding: 3px;
+}
+.markdown_help {
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.markdown_help,.markdown_help th,.markdown_help td {
+    border: 1px solid #ccc;
+}
+.markdown_help td {
+  font-weight: normal;
+}
 
 /* Dialog CSS */ 
 dialog-box .dialog-background {
@@ -379,17 +428,19 @@ dialog-box .dialog-background {
 }
 
 dialog-box .dialog {
-  position: fixed;
+  position: absolute;
   padding: 10px 50px;
   background: white;
   border-radius: 5px;
   min-width: 350px;
   max-width: 50%;
   min-height: 180px;
-  top: calc(50% - 150px);
-  left: 50%;
+  top: 50px;
   z-index: 201;
-  margin-left: -25%;
+}
+dialog-box.markdown_help .dialog {
+  width: 350px;
+  left: calc(50% - 225px);
 }
 dialog-box .dialog small {
   color: inherit;  
@@ -476,6 +527,7 @@ dialog-box .error {
   margin-top: 10px;
   text-align: center;
   min-width: 500px;
+  display: block;
 }
 .snippet_detail > * {
   margin: 0 30px;
@@ -492,13 +544,17 @@ dialog-box .error {
 }
 .snippet_detail .content {
   text-align: left;
-}
-.snippet_detail .content pre{
-  padding: 10px;
   font-size:14px;
+}
+.snippet_detail .content pre.prettyprint{
+  padding: 10px;
   margin: 0;
   overflow: auto;
   word-wrap: break-word;
+}
+.snippet_detail .content code.prettyprint {
+  padding: 0 5px;
+  margin: 0 3px;
 }
 .snippet_detail share > div {
   display: inline-block;

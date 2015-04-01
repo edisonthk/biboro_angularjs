@@ -58,53 +58,62 @@
 				</li>
 			</ul>
 		</div>
-
+		
+		<!-- ////////////////////////////////////////////// -->
+		<!-- Dashboard -->		
+		<ng-include 
+			class="snippet_detail" 
+			ng-if="global.state.is('snippets')" 
+			src="'components/dashboard.html'">
+		</ng-include>
 
 		<!-- ////////////////////////////////////////////// -->
 		<!-- Show -->
-		<div class="snippet_detail notfound" ng-if="snippet == null">
-			<h1>Not found</h1>
-		</div>
-		<div class="snippet_detail" ng-if="snippet != null" ng-class="{editor_state: isEditorPage()}">
+		<div ng-if="!global.state.is('snippets')">
+			<div class="snippet_detail notfound" ng-if="snippet == null">
+				<h1>Not found</h1>
+			</div>
+			<div class="snippet_detail" ng-if="snippet != null" ng-class="{editor_state: isEditorPage()}">
 
-			<h1>{{snippet.title}}</h1>
+				<h1>{{snippet.title}}</h1>
 
-			<ul class="snippet_tags">
-				<li ng-repeat="_tag in snippet.tags">{{_tag.text}}</li>
-			</ul>
+				<ul class="snippet_tags">
+					<li ng-repeat="_tag in snippet.tags">{{_tag.text}}</li>
+				</ul>
 
-			<!-- Editable user metadata -->
-			<div ng-if="snippet.editable" class="snippet_metadata">
-				<span><i class="fa fa-pencil-square-o fa-lg"></i>あなた</span>
-				<span><i class="fa fa-clock-o fa-lg"></i>{{snippet.updated_at}}</span>
+				<!-- Editable user metadata -->
+				<div ng-if="snippet.editable" class="snippet_metadata">
+					<span><i class="fa fa-pencil-square-o fa-lg"></i>あなた</span>
+					<span><i class="fa fa-clock-o fa-lg"></i>{{snippet.updated_at}}</span>
 
-				<!-- スニペット更新 -->
-				<div class="btn-group" ng-if="!global.state.is('snippets.new')" >
-					<button ng-click="modifySnippetEvent(snippet.id)" ng-bind-html="modify_button_title"></button>
-					<button ng-if="global.state.is('snippets.single.editor')" ng-click="cancelSnippetEvent(snippet.id)">取り消し <small>ESC</small></button>
-					<button class="destroy" ng-click="destroySnippetEvent(snippet.id)">削除 <small>{{symbol_cmd}}+DEL</small></button>
+					<!-- スニペット更新 -->
+					<div class="btn-group" ng-if="!global.state.is('snippets.new')" >
+						<button ng-click="modifySnippetEvent(snippet.id)" ng-bind-html="modify_button_title"></button>
+						<button ng-if="global.state.is('snippets.single.editor')" ng-click="cancelSnippetEvent(snippet.id)">取り消し <small>ESC</small></button>
+						<button class="destroy" ng-click="destroySnippetEvent(snippet.id)">削除 <small>{{symbol_cmd}}+DEL</small></button>
+					</div>
+
+					<div class="btn-group" ng-if="global.state.is('snippets.new')">
+						<button ng-click="createSnippetEvent()">新規作成 <small>{{symbol_cmd}}+S</small></button>
+						<button ng-click="cancelSnippetEvent()">取り消し <small>ESC</small></button>
+					</div>
+
+					<span ng-if="!isEditorPage()" class="split"></span>
+
+					<share ng-if="!isEditorPage()" title="snippet.title" description="minify(snippet.content)"></share>
 				</div>
 
-				<div class="btn-group" ng-if="global.state.is('snippets.new')">
-					<button ng-click="createSnippetEvent()">新規作成 <small>{{symbol_cmd}}+S</small></button>
-					<button ng-click="cancelSnippetEvent()">取り消し <small>ESC</small></button>
+				<!-- Not-editable user metadata -->
+				<div ng-if="!snippet.editable" class="snippet_metadata">
+					<span>{{snippet.creator_name}}</span>
+					<span>{{snippet.updated_at}}</span>
+
 				</div>
 
-				<span ng-if="!isEditorPage()" class="split"></span>
-
-				<share ng-if="!isEditorPage()" title="snippet.title" description="minify(snippet.content)"></share>
+				<div></div>
+				
+				<div class="content" markdown="snippet.content"></div>
 			</div>
-
-			<!-- Not-editable user metadata -->
-			<div ng-if="!snippet.editable" class="snippet_metadata">
-				<span>{{snippet.creator_name}}</span>
-				<span>{{snippet.updated_at}}</span>
-
-			</div>
-
-			<div></div>
-			
-			<div class="content" html="snippet.content"></div>
 		</div>
 
 
@@ -133,7 +142,7 @@
 					</tags-input>
 				</div>
 				<div class='input-group'>
-					<label>内容</label>
+					<label><span style="float:left;">内容</span><span class="markdown-help"><a ng-click="openMarkdownManual()">マークダウンの使い方？</a></span></label>
 					<editor uploaded-callback="fileUploadedCallback" ng-model="snippet.content"></editor>
 				</div>
 			</div>
@@ -141,7 +150,20 @@
 
 		<!-- ////////////////////////////////////////////// -->
 		<!-- dialog -->
-		<dialog-box ng-if="dialogBox.show" title="dialogBox.title" message="dialogBox.message">
+		<dialog-box 
+			ng-class="[dialogBox.type]"
+			ng-if="dialogBox.show" 
+			title="dialogBox.title" 
+			message="dialogBox.message" 
+			outside-clicked-event="dialogBox.outsideClickedEvent">
+
+			<div ng-if="dialogBox.type == 'markdown_help'">
+				<ng-include src="'components/markdown_help.html'"></ng-include>
+				<button 
+					class="btn btn-default"
+					ng-click="dialogBox.noButtonClickEvent()" 
+					ng-bind-html="dialogBox.noButtonText"></button>
+			</div>
 
 			<div ng-if="dialogBox.type == 'feedback'">
 				<p ng-if="dialogBox.error_message != null" class="error">{{dialogBox.error_message}}</p>
