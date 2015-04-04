@@ -60,9 +60,6 @@ code .dec { color: #98fb98 } /* decimal         - lightgreen */
 .brand-name a {
   text-decoration: none;
 }
-.brand-name  a:link {
-  color: #666;
-}
 .brand-name{
   border-bottom:2px solid #666;
   height: 50px;
