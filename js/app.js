@@ -22,5 +22,5 @@ angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.ser
 		$urlRouterProvider.otherwise('/');
 
 
-		// $locationProvider.html5Mode(!0).hashPrefix("!");
+		$locationProvider.html5Mode(!0).hashPrefix("!");
 	}]);
