@@ -34,12 +34,11 @@ angular.module('app.directives',[])
 	    link: function (scope, ele, attrs) {
 	      scope.$watch(attrs.markdown, function(markdown) {
 
-	      	// filter '>', '<'
+	      	// filter content by escape '>', '<'
 	      	markdown = markdown
 	      		.replace(/</g,'&lt;')
 	      		.replace(/>/g,'&gt;')
 	      		.replace(/```\n?(.*?)\n?```/g, function(match, code) {
-	      			console.log(match);
 	      			return match.replace(/&lt;/g,'<').replace(/&gt;/g,'>');
 	      		})
 	      		.replace(/&gt; /g,'> ');

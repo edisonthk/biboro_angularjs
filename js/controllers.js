@@ -1,13 +1,24 @@
 'use strict';
 
 angular.module('app.controllers',[])
+	.controller('LoaderController', ['$scope', function(scope) {
+		scope.loaded = false;
+
+		scope.onloadedEvent = function() {
+			scope.loaded = true;
+			
+		};
+	}])
 	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','$http','Snippet','User','toaster','Feedback',
 	function(scope, rootScope, state, stateParams,Http ,Snippet,User, Toaster, Feedback){
 
 		scope.global = {};
 		scope.global.state = state;
 
-		var symbol_cmd = "⌘";
+		var symbol_cmd = "Ctrl";
+		if(window.navigator.platform.indexOf("Mac") >= 0){
+			symbol_cmd = "⌘";
+		}
 
 		// 
 		// initial several variables
@@ -20,213 +31,8 @@ angular.module('app.controllers',[])
 		scope.symbol_cmd = symbol_cmd;
 		state.previous = null;
 		scope.searching = false;
+
 		
-		// $scope.$watch(function(){
-		// 	return $scope.kw;
-		// }, function() {
-		// 	console.log($scope.kw);
-		// });
-		scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
-			
-			
-
-			// if wrong pathing, correct the redirect. 
-			if(state.is('snippets.single')){
-				if(toParams.id.length <= 0) {
-					state.go('snippets');
-					return; 
-				}
-			}
-
-			if(fromState.name.length > 0){
-				state.previous = {name: fromState.name, params: fromParams};
-			}else{
-				state.previous = null;
-			}
-			
-
-			if(toParams.id){
-				scope.selected_snippet_id = toParams.id;
-
-				if(scope.isEditorPage()){
-					// 
-					// state: editor page for modify snippet
-					// ===========================================
-					scope.errors = null;
-					scope.modify_button_title = "更新 <small>"+symbol_cmd+"+S</small>";
-					
-				}else{
-					scope.modify_button_title = "編集 <small>"+symbol_cmd+"+E</small>";
-					
-				}
-				// 
-				// state: snippets.single
-				// =========================
-				Snippet.get({snippetId: toParams.id}, function(data) {
-					scope.snippet = filterServerSnippet( data );
-				}, function() {
-					// failed to retrieve snippet
-					scope.snippet = null;
-				});
-
-			}else{
-
-				// scope.snippet = null;
-
-				if(scope.isEditorPage()) {
-					// 
-					// state: editor page for create new snippet
-					// ===========================================
-					scope.errors = null;
-					
-					scope.snippet = initialSnippet();
-					scope.snippet.editable = true;
-					scope.snippet.updated_at = "";
-				}
-			}
-		});
-
-		var searchbox_input = document.getElementById("searchbox_input");
-		var searchbox_flag = false;
-		var _current_pre_ele = 0;
-		searchbox_input.addEventListener('focus', function(e) {
-			searchbox_flag = true;
-		});
-		searchbox_input.addEventListener('blur', function(e) {
-			searchbox_flag = false;
-		});
-		window.addEventListener('keydown', function(e) {
-
-			if(scope.dialogBox && scope.dialogBox.show) {
-				//
-				// When dialogBox is showing
-				if( isKeyPressed(e, false, KeyEvent.KEY_ESC)){
-					e.preventDefault();
-					scope.dialogBox.show = false;
-				}	
-			}else if(!scope.isEditorPage()){
-				// 
-				// Handler several shortcut on snippet view page
-				// such as /snippet or /snippet/:snippetId page
-				// 
-				// In this page, 
-
-				if( isKeyPressed(e,false, KeyEvent.KEY_0_9) || 
-					isKeyPressed(e,false, KeyEvent.KEY_A_Z) ){
-					// focus to searchbox input
-					searchbox_input.focus();
-				}else if( isKeyPressed(e,false, KeyEvent.KEY_ESC)){
-					// blur focus from searchbox input
-					searchbox_input.blur();
-				}else if( isKeyPressed(e,false, KeyEvent.KEY_UP)) {
-					e.preventDefault();
-
-					// move to most recent history item
-					var _c = current_selected_history_keywords;
-					if(_c >= 0) {
-						scope.kw = historyKwsManager[_c];
-						_c -- ;
-						current_selected_history_keywords = _c;
-					}
-
-				}else if( isKeyPressed(e, false, KeyEvent.KEY_DOWN)) {
-					e.preventDefault();
-
-					// move to history item just read
-					var _c = current_selected_history_keywords;
-					if(_c < historyKwsManager.length - 1) {
-						_c ++ ;
-						scope.kw = historyKwsManager[_c];
-						current_selected_history_keywords = _c;
-					}
-
-				}else if( isKeyPressed(e,true, KeyEvent.KEY_A) && !searchbox_flag ){
-					e.preventDefault();
-					// highlight code in snippet_detail (page in right hand side)
-					var _body = document.querySelector(".snippet_detail .content");
-					if(_body){
-						var _elements = _body.getElementsByTagName("pre");
-						if(_elements && _elements.length > 0){
-								
-							if(_current_pre_ele >= _elements.length){
-								_current_pre_ele = 0;
-							}
-							highlightText(_elements[_current_pre_ele]);
-							_current_pre_ele ++;
-						
-						}
-					}
-				}else if( isKeyPressed(e, true, KeyEvent.KEY_E)) {
-
-					// Move to edit page
-					// When user is able to modify current selected snippet, Cmd + E will allow user to
-					// move to editor page to modify current selected snippet.					
-					e.preventDefault();
-					if(scope.snippet != null){
-						state.go('snippets.single.editor',{id: scope.snippet.id});
-					}
-				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
-					//
-					// When user is able to modify the current snippet and able to delete it
-					// allow user to using Cmd + DEL to delete current snippet 
-					e.preventDefault();
-					if(scope.snippet.editable) {
-						scope.destroySnippetEvent(scope.snippet.id);	
-					}
-				}else if( isKeyPressed(e, true, KeyEvent.KEY_B)) {
-					e.preventDefault();
-					if( User.logined ) {
-						state.go('snippets.new');
-					}else{
-						Toaster.pop({
-							type: 'error',
-							body: '新規作成はログインしてから作成です',
-						})
-					}
-				}
-			}else {
-				// 
-				// Handle several shortcut at editor page 
-				if( isKeyPressed(e,true, KeyEvent.KEY_S) ) {
-					e.preventDefault();
-					// Cmd + S
-					// saving
-					if(state.is("snippets.new")) {
-						scope.createSnippetEvent();
-					}else{
-						scope.modifySnippetEvent(scope.snippet.id);	
-					}
-					
-				}else if( isKeyPressed(e, false, KeyEvent.KEY_ESC)) {
-					// ESC
-					// Quit editor mode
-					// If current page is snippets.new page, go to previous state
-					// else if current page is snippets.single.edit page, go to snippets.single page
-					e.preventDefault();
-					if(state.is('snippets.new')) {
-						scope.goToPreviousState();
-					}else{
-						state.go('snippets.single',{id: scope.snippet.id});
-					}
-				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
-					// Cmd + DEL
-					// 
-					e.preventDefault();
-					if(scope.snippet.editable) {
-						scope.destroySnippetEvent(scope.snippet.id);	
-					}
-				}
-			}
-		});
-		window.addEventListener('keyup', function(e) {
-			if(!scope.isEditorPage()) {
-				var keyPressed = e.keyCode;
-				if(keyPressed == KeyEvent.KEY_ENTER) {
-					enterKeyUpCallback();
-				}
-			}
-			scope.$apply();
-		});
 
 		scope.loginedCallback = function(results) {
 			if(results.error) {
@@ -246,8 +52,10 @@ angular.module('app.controllers',[])
 		};
 
 		var searching_offset_timeout;
-		scope.searchingEvent = function() {
-			var kw = scope.kw;
+		scope.searchingEvent = function(kw) {
+
+			scope.kw = kw;
+
 			// when there is change in searchbox, 
 			// reset the current index history keywords
 			reset_current_index_history_keywords();
@@ -447,7 +255,6 @@ angular.module('app.controllers',[])
 						Toaster.pop({
 							type: 'success',
 			                body: 'ご意見ありがとうございます！',
-			                showCloseButton: true
 						});
 					}else{
 						scope.dialogBox.error_message = 'テキストボックスにご記入ください。';
@@ -481,32 +288,336 @@ angular.module('app.controllers',[])
 		// After that, scope.kw will be clear.
 		var historyKwsManager = [];
 		var current_selected_history_keywords = -1;
-		var enterKeyUpCallback = function() {
+		var enterKeyUpCallback = function(e) {
 			if(scope.kw.length > 0 && !scope.kw.match(/^[0-9]+$/g)){
 				historyKwsManager.push(scope.kw);
 				scope.searchingEvent();
 			}
 			scope.kw = "";
+			e.target.blur();
+
 		};
 
 		var reset_current_index_history_keywords = function() {
 			current_selected_history_keywords = historyKwsManager.length - 1;
 		};
-		
 
 		scope.loginEvent = loginEvent;
 
-		scope.isEditorPage = function() {
-			return state.is('snippets.single.editor') || state.is('snippets.new');
+		scope.isEditorPage = function(state_name) {
+			if(typeof state_name === 'undefined') {
+				return state.is('snippets.single.editor') || state.is('snippets.new');	
+			}
+
+			return state_name == 'snippets.single.editor' || state_name == 'snippets.new';
 		};
 
 		scope.minify = minifyContent;
+
+		var interval_draft_event = function() {
+			if(stateParams.id) {
+				saveDraft(stateParams.id);	
+			}else{
+				saveDraft();
+			}
+		}
+
+		var saveDraft = function(snippet_id) {
+			// only save draft when snippet is loaded
+			if(loaded) {
+
+				var _tags = [];
+				if(Array.isArray(scope.snippet.tags)) {
+					for (var i = 0; i < scope.snippet.tags.length; i++) {
+						_tags.push(scope.snippet.tags[i].text);
+					};	
+				}
+				
+
+				var _data = {
+					title: scope.snippet.title,
+					content: scope.snippet.content,
+					tags: _tags,
+				};
+
+				console.log("fsdfsdfsd");
+
+				if(typeof snippet_id === 'undefined') {
+					Snippet.draft({}, _data);
+				}else{
+					Snippet.draft({snippetId: snippet_id}, _data);
+				}
+			}
+		};
+
+		// $scope.$watch(function(){
+		// 	return $scope.kw;
+		// }, function() {
+		// 	console.log($scope.kw);
+		// });
+		var draft_interval_id, 
+			loaded = false;
+		scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+
+			// if wrong pathing, correct the redirect. 
+			if(state.is('snippets.single')){
+				if(toParams.id.length <= 0) {
+					state.go('snippets');
+					return; 
+				}
+			}
+
+			clearInterval(draft_interval_id);
+			if(scope.isEditorPage(fromState.name)) {
+				if(fromParams.id) {
+					saveDraft(fromParams.id);
+				}else{
+					saveDraft();	
+				}
+				if(loaded) {
+					Toaster.pop({
+						type: 'info',
+		                body: '下書き保存しました',
+					});
+				}
+			}
+			loaded = false;
+
+			if(fromState.name.length > 0){
+				state.previous = {name: fromState.name, params: fromParams};
+			}else{
+				state.previous = null;
+			}
+
+			if(toParams.id){
+				scope.selected_snippet_id = toParams.id;
+
+				if(scope.isEditorPage()){
+					// 
+					// state: snippets.single.editor
+					// 
+					// Editor page for modify exists snippet
+					// ===========================================
+					scope.errors = null;
+					scope.modify_button_title = "更新 <small>"+symbol_cmd+"+S</small>";
+
+					Snippet.getEdit({snippetId: stateParams.id}, function(data) {
+						console.log(data.snippet);
+						scope.snippet = filterServerSnippet(data.snippet);
+
+						loaded = true;
+						draft_interval_id = setInterval(interval_draft_event, 60000);
+					});
+					
+				}else{
+					scope.modify_button_title = "編集 <small>"+symbol_cmd+"+E</small>";
+					
+					// 
+					// state: snippets.single
+					// =========================
+
+					Snippet.get({snippetId: toParams.id}, function(data) {
+						scope.snippet = filterServerSnippet( data );
+					}, function() {
+						// failed to retrieve snippet
+						scope.snippet = null;
+					});
+
+				}
+
+			}else{
+
+				// scope.snippet = null;
+
+				if(scope.isEditorPage()) {
+					// 
+					// state: editor page for create new snippet
+					// ===========================================
+					scope.errors = null;
+					scope.snippet.editable = true;
+					scope.snippet.updated_at = "";
+
+					Snippet.getCreate({}, function(data) {
+
+
+						if(data.snippet == null){
+							scope.snippet = initialSnippet();
+						}else{
+							scope.snippet = filterServerSnippet( data.snippet );	
+						}
+
+						loaded = true;
+						draft_interval_id = setInterval(interval_draft_event, 60000);
+					});
+				}
+			}
+		});
+
+		var searchbox_input;
+		var searchbox_flag = false;
+		var _current_pre_ele = 0;
+		scope.searchingElementLoaded = function() {
+			searchbox_input = document.getElementById("searchbox_input");
+			searchbox_input.addEventListener('focus', function(e) {
+				searchbox_flag = true;
+			});
+			searchbox_input.addEventListener('blur', function(e) {
+				searchbox_flag = false;
+			});
+		};
+		window.addEventListener('keydown', function(e) {
+
+			if(scope.dialogBox && scope.dialogBox.show) {
+				//
+				// When dialogBox is showing
+				if( isKeyPressed(e, false, KeyEvent.KEY_ESC)){
+					e.preventDefault();
+					scope.dialogBox.show = false;
+				}	
+			}else if(!scope.isEditorPage()){
+				// 
+				// Handler several shortcut on snippet view page
+				// such as /snippet or /snippet/:snippetId page
+				// 
+				// In this page, 
+
+				if( isKeyPressed(e,false, KeyEvent.KEY_0_9) || 
+					isKeyPressed(e,false, KeyEvent.KEY_A_Z) ){
+					// focus to searchbox input
+					searchbox_input.focus();
+				}else if( isKeyPressed(e,false, KeyEvent.KEY_ESC)){
+					// blur focus from searchbox input
+					searchbox_input.blur();
+				}else if( isKeyPressed(e,false, KeyEvent.KEY_UP)) {
+					e.preventDefault();
+
+					// move to most recent history item
+					var _c = current_selected_history_keywords;
+					if(_c >= 0) {
+						scope.kw = historyKwsManager[_c];
+						_c -- ;
+						current_selected_history_keywords = _c;
+					}
+
+				}else if( isKeyPressed(e, false, KeyEvent.KEY_DOWN)) {
+					e.preventDefault();
+
+					// move to history item just read
+					var _c = current_selected_history_keywords;
+					if(_c < historyKwsManager.length - 1) {
+						_c ++ ;
+						scope.kw = historyKwsManager[_c];
+						current_selected_history_keywords = _c;
+					}
+
+				}else if( isKeyPressed(e,true, KeyEvent.KEY_A) && !searchbox_flag ){
+					e.preventDefault();
+					// highlight code in snippet_detail (page in right hand side)
+					var _body = document.querySelector(".snippet_detail .content");
+					if(_body){
+						var _elements = _body.getElementsByTagName("pre");
+						if(_elements && _elements.length > 0){
+								
+							if(_current_pre_ele >= _elements.length){
+								_current_pre_ele = 0;
+							}
+							highlightText(_elements[_current_pre_ele]);
+							_current_pre_ele ++;
+						
+						}
+					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_E)) {
+
+					// Cmd + E
+					//
+					// Move to edit page
+					// When user is able to modify current selected snippet, Cmd + E will allow user to
+					// move to editor page to modify current selected snippet.					
+					e.preventDefault();
+					if(scope.snippet != null){
+						if(!User.logined) {
+							Toaster.pop({
+								type: 'error',
+								body: '編集するのにログインが必用です。',
+							});
+						}else if(scope.snippet.editable) {
+							state.go('snippets.single.editor',{id: scope.snippet.id});
+						}else{
+							Toaster.pop({
+								type: 'error',
+								body: '編集権限はありません。',
+							});
+						}
+					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
+					//
+					// When user is able to modify the current snippet and able to delete it
+					// allow user to using Cmd + DEL to delete current snippet 
+					e.preventDefault();
+					if(scope.snippet.editable) {
+						scope.destroySnippetEvent(scope.snippet.id);	
+					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_B)) {
+					e.preventDefault();
+					if( User.logined ) {
+						state.go('snippets.new');
+					}else{
+						Toaster.pop({
+							type: 'error',
+							body: '新規作成はログインしてから作成です',
+						});
+					}
+				}else if( isKeyPressed(e, false, KeyEvent.KEY_DEL)) {
+					searchbox_input.focus();
+				}
+			}else {
+				// 
+				// Handle several shortcut at editor page 
+				if( isKeyPressed(e,true, KeyEvent.KEY_S) ) {
+					e.preventDefault();
+					// Cmd + S
+					// saving
+					if(state.is("snippets.new")) {
+						scope.createSnippetEvent();
+					}else{
+						scope.modifySnippetEvent(scope.snippet.id);	
+					}
+					
+				}else if( isKeyPressed(e, false, KeyEvent.KEY_ESC)) {
+					// ESC
+					// Quit editor mode
+					// If current page is snippets.new page, go to previous state
+					// else if current page is snippets.single.edit page, go to snippets.single page
+					e.preventDefault();
+					if(state.is('snippets.new')) {
+						scope.goToPreviousState();
+					}else{
+						state.go('snippets.single',{id: scope.snippet.id});
+					}
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
+					// Cmd + DEL
+					// 
+					e.preventDefault();
+					if(scope.snippet.editable) {
+						scope.destroySnippetEvent(scope.snippet.id);	
+					}
+				}
+			}
+		});
+		window.addEventListener('keyup', function(e) {
+			if(!scope.isEditorPage()) {
+				var keyPressed = e.keyCode;
+				if(keyPressed == KeyEvent.KEY_ENTER) {
+					enterKeyUpCallback(e);
+				}
+			}
+			scope.$apply();
+		});
 
 	}])
 	.controller('EditorController', ['$scope',function(scope){
 
 		var input_element = document.querySelector(".editor .input-group input");
-		console.log(input_element);
 
 		if(input_element != null) {
 			input_element.focus();
@@ -528,6 +639,8 @@ angular.module('app.controllers',[])
 			}
 			
 		};
+
+
 		
 	}]);
 

@@ -10,8 +10,11 @@ angular.module('app.services', ['ngResource'])
       	return $resource('/json/snippet/:snippetId', {}, {
           query: {method:'GET', params:{snippetId:''}, isArray:true},
           get: {method:'GET'},
+          getCreate: {method: 'GET', url: '/json/snippet/create'}, 
+          getEdit: {method: 'GET', url:'/json/snippet/:snippetId/edit'},
           update: {method:'PUT'},
           create: {method: 'POST', url:'/json/snippet/'},
+          draft: {method:'PUT', url:'/json/snippet/draft/:snippetId'},
           delete: {method: 'DELETE'}
         });
 

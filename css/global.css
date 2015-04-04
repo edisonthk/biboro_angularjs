@@ -106,6 +106,34 @@ code .dec { color: #98fb98 } /* decimal         - lightgreen */
   display: inline-block;
 }
 
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.splash-screen h1,.splash-screen h3{
+  font-weight: normal;
+}
+.splash-screen h1 {
+  text-align: center;
+  margin-bottom: 0;
+  color: rgb(22, 109, 244);
+}
+.splash-screen h3 {
+  display: block;
+  width: 120px;
+  margin: 0 auto;
+  font-size: 16px;
+}
+.splash-screen h3 span {
+  font-size: 150%;
+}
+.splash-screen .center {
+  margin-top: 200px;
+}
+
 .nav-field ul li a {
   color: rgb(65, 95, 187);
 }
