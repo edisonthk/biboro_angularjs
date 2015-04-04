@@ -365,21 +365,9 @@ angular.module('app.controllers',[])
 				}
 			}
 
+			// cancel draft interval event
 			clearInterval(draft_interval_id);
-			if(scope.isEditorPage(fromState.name)) {
-				if(fromParams.id) {
-					saveDraft(fromParams.id);
-				}else{
-					saveDraft();	
-				}
-				if(loaded) {
-					Toaster.pop({
-						type: 'info',
-		                body: '下書き保存しました',
-					});
-				}
-			}
-			loaded = false;
+			
 
 			if(fromState.name.length > 0){
 				state.previous = {name: fromState.name, params: fromParams};
@@ -587,11 +575,22 @@ angular.module('app.controllers',[])
 					// If current page is snippets.new page, go to previous state
 					// else if current page is snippets.single.edit page, go to snippets.single page
 					e.preventDefault();
+
+
 					if(state.is('snippets.new')) {
+						saveDraft();
 						scope.goToPreviousState();
 					}else{
+						saveDraft(stateParams.id);
 						state.go('snippets.single',{id: scope.snippet.id});
 					}
+					if(loaded) {
+						Toaster.pop({
+							type: 'info',
+			                body: '下書き保存しました',
+						});
+					}
+					loaded = false;
 				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
 					// Cmd + DEL
 					// 
