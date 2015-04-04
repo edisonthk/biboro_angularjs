@@ -340,8 +340,6 @@ angular.module('app.controllers',[])
 					tags: _tags,
 				};
 
-				console.log("fsdfsdfsd");
-
 				if(typeof snippet_id === 'undefined') {
 					Snippet.draft({}, _data);
 				}else{
