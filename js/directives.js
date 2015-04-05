@@ -210,6 +210,24 @@ angular.module('app.directives',['ngSanitize'])
 			}
 		}
 	}])
+	.directive('onFinishRender', ['$timeout',function(Timeout) {
+		return {
+			restrict: 'A',
+			scope: {
+				onFinishRender: '=',
+			},
+			link: function(scope, ele, attrs) {
+
+				if (scope.$parent.$last === true) {
+					Timeout(function() {
+						if(typeof scope.onFinishRender === 'function') {
+		                	scope.onFinishRender();
+		                }
+					});
+	            }
+			}
+		};
+	}])
 	.directive('animator',['$rootScope',function($rootScope){
 
 		return {

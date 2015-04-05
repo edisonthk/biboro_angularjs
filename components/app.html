@@ -28,7 +28,10 @@
 				type="text" />
 		</div>
 		<ul>
-			<li ng-repeat="_snippet in snippets" ng-class="{active: _snippet.id === selected_snippet_id}">
+			<li 
+				ng-repeat="_snippet in snippets" 
+				ng-class="{active: _snippet.id === selected_snippet_id}" 
+				on-finish-render="snippetsRenderedCallback" >
 				<a ui-sref="snippets.single({id:_snippet.id})">
 					<div class="index">{{$index + 1}}</div>
 					<div class="title">
@@ -125,7 +128,12 @@
 				</tags-input>
 			</div>
 			<div class='input-group'>
-				<label><span style="float:left;">内容</span><span class="markdown-help"><a ng-click="openMarkdownManual()">マークダウンの使い方？</a></span></label>
+				<label>
+					<span style="float:left;">内容</span>
+					<span class="markdown-help">
+						<a ng-click="openMarkdownManual()">マークダウンの使い方？</a>
+					</span>
+				</label>
 				<editor uploaded-callback="fileUploadedCallback" ng-model="snippet.content"></editor>
 			</div>
 		</div>

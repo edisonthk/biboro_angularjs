@@ -22,7 +22,14 @@ angular.module('app.controllers',[])
 
 		// 
 		// initial several variables
-		scope.snippets = Snippet.query();
+		scope.snippets = Snippet.query(function() {
+			// for (var i = 0; i < scope.snippets.length; i++) {
+			// 	if(scope.snippets[i].id == stateParams.id) {
+			// 		scrollInListItem(i);
+			// 		break;		
+			// 	}
+			// };
+		});
 		scope.modify_button_title = "編集";
 		scope.flag_editing = false;
 		scope.errors = null;
@@ -32,6 +39,14 @@ angular.module('app.controllers',[])
 		state.previous = null;
 		scope.searching = false;
 
+		scope.snippetsRenderedCallback = function() {
+			for (var i = 0; i < scope.snippets.length; i++) {
+				if(scope.snippets[i].id == stateParams.id) {
+					scrollInListItem(i);
+					break;		
+				}
+			};
+		}
 
 		scope.loginedCallback = function(results) {
 			if(results.error) {
@@ -78,7 +93,6 @@ angular.module('app.controllers',[])
 						// if kw is number, do "selecting"
 						var _index = parseInt(kw) - 1;
 						if(_index < scope.snippets.length) {
-							scrollInListItem(_index);
 							state.go('snippets.single',{id: scope.snippets[_index].id} );
 						}
 					}else{
@@ -405,6 +419,15 @@ angular.module('app.controllers',[])
 					// =========================
 
 					Snippet.get({snippetId: toParams.id}, function(data) {
+
+						for (var i = 0; i < scope.snippets.length; i++) {
+							if(scope.snippets[i].id == toParams.id) {
+								scrollInListItem(i);
+								break;		
+							}
+						};
+						
+
 						scope.snippet = filterServerSnippet( data );
 					}, function() {
 						// failed to retrieve snippet
@@ -738,7 +761,12 @@ var scrollInListItem = function(_index) {
 	
 	var lists = document.querySelector("div.lists ul");
 	var items = lists.children;
-	lists.parentElement.scrollTop = items[_index].offsetTop;
+	
+	// check if current item is visible in page or not
+	// if it is not visible in page, do scrollTop event
+	if(window.innerHeight < items[_index].getBoundingClientRect().bottom) {
+		lists.parentElement.scrollTop = items[_index].offsetTop;	
+	}
 	
 	// console.log(items[1].offsetTop +' '+ lists.offsetTop +' '+ items[0].clientHeight);
 }
