@@ -189,8 +189,9 @@ a {text-decoration: none;}
   padding: 1px 7px;
   background-color: #794747;
   color: #fff;
-  margin-right: 14px;
   position: relative;
+  margin-right: 14px;
+  margin-bottom: 6px;
 }
 
 .snippet_tags > li:after {
@@ -457,11 +458,11 @@ dialog-box .dialog {
   padding: 10px 50px;
   background: white;
   border-radius: 5px;
-  min-width: 350px;
-  max-width: 50%;
   min-height: 180px;
   top: 50px;
   z-index: 201;
+  width: 550px;
+  left: calc(50% - 325px);
 }
 dialog-box.markdown_help .dialog {
   width: 350px;

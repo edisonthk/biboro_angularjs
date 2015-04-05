@@ -26,31 +26,32 @@ var prettify = function(converter) {
 var Converter = new Showdown.converter({ extensions: [prettify] });
 
 
-angular.module('app.directives',[])
+angular.module('app.directives',['ngSanitize'])
 	.directive('markdown', function ($compile) {
 	  return {
 	    restrict: 'A',
+	    scope: {
+	    	markdown: '=',
+	    },
 	    replace: true,
+	    template: '<div ng-bind-html="Converter.makeHtml(markdown)"></div>',
 	    link: function (scope, ele, attrs) {
-	      scope.$watch(attrs.markdown, function(markdown) {
+	    	scope.Converter = Converter;
+	    	var changed = false;
+	    	var myId = setInterval(function() {
+	    		if(changed) {
+	    			prettyPrint();
+	    		}
+	    		changed = false;
+	    	}, 1000);
 
-	      	// filter content by escape '>', '<'
-	      	markdown = markdown
-	      		.replace(/</g,'&lt;')
-	      		.replace(/>/g,'&gt;')
-	      		.replace(/```\n?(.*?)\n?```/g, function(match, code) {
-	      			return match.replace(/&lt;/g,'<').replace(/&gt;/g,'>');
-	      		})
-	      		.replace(/&gt; /g,'> ');
-
-	      	// convert markdown to html
-	        ele.html(Converter.makeHtml(markdown));
-	        $compile(ele.contents())(scope);
-
-	        // prettify code
-	        prettyPrint();
-
-	      });
+	    	scope.$watch('markdown', function() {
+	    		changed = true;
+	    	});
+	    	
+	    	ele.on('$destroy', function() {
+	    		clearInterval(myId);
+	    	});
 	    }
 	  };
 	})

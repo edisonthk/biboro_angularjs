@@ -32,7 +32,6 @@ angular.module('app.controllers',[])
 		state.previous = null;
 		scope.searching = false;
 
-		
 
 		scope.loginedCallback = function(results) {
 			if(results.error) {
@@ -79,6 +78,7 @@ angular.module('app.controllers',[])
 						// if kw is number, do "selecting"
 						var _index = parseInt(kw) - 1;
 						if(_index < scope.snippets.length) {
+							scrollInListItem(_index);
 							state.go('snippets.single',{id: scope.snippets[_index].id} );
 						}
 					}else{
@@ -234,7 +234,8 @@ angular.module('app.controllers',[])
 					scope.dialogBox.show = false;
 				},
 			}
-		
+			
+			scope.dialogBox.outsideClickedEvent = scope.dialogBox.noButtonClickEvent;
 		};
 
 		scope.feedbackEvent = function() {
@@ -264,6 +265,8 @@ angular.module('app.controllers',[])
 					scope.dialogBox.show = false;
 				},
 			}
+
+			scope.dialogBox.outsideClickedEvent = scope.dialogBox.noButtonClickEvent;
 		};
 
 		scope.openMarkdownManual = function() {
@@ -274,7 +277,6 @@ angular.module('app.controllers',[])
 				noButtonText: "閉じる",
 				title: '<i class="fa fa-question-circle"></i> マニュアル',
 				noButtonClickEvent: function() {
-					console.log("fsdfsdfs");
 					scope.dialogBox.show = false;
 				},
 			}
@@ -420,8 +422,6 @@ angular.module('app.controllers',[])
 					// state: editor page for create new snippet
 					// ===========================================
 					scope.errors = null;
-					scope.snippet.editable = true;
-					scope.snippet.updated_at = "";
 
 					Snippet.getCreate({}, function(data) {
 
@@ -432,6 +432,8 @@ angular.module('app.controllers',[])
 							scope.snippet = filterServerSnippet( data.snippet );	
 						}
 
+						scope.snippet.editable = true;
+						scope.snippet.updated_at = "";
 						loaded = true;
 						draft_interval_id = setInterval(interval_draft_event, 60000);
 					});
@@ -459,7 +461,17 @@ angular.module('app.controllers',[])
 				if( isKeyPressed(e, false, KeyEvent.KEY_ESC)){
 					e.preventDefault();
 					scope.dialogBox.show = false;
-				}	
+				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
+					// Cmd + DEL
+					// When destroy confirmation dialogBox is showing
+					if(scope.snippet != null && scope.snippet.editable) {
+						// after confirm with user by showing delete confirmation dialog
+						// allow user to destroy current selected snippet
+						scope.dialogBox.okButtonClickEvent();
+					}	
+				}
+
+				
 			}else if(!scope.isEditorPage()){
 				// 
 				// Handler several shortcut on snippet view page
@@ -541,7 +553,14 @@ angular.module('app.controllers',[])
 					// allow user to using Cmd + DEL to delete current snippet 
 					e.preventDefault();
 					if(scope.snippet.editable) {
-						scope.destroySnippetEvent(scope.snippet.id);	
+						if(scope.dialogBox && scope.dialogBox.show) {
+							// user is confirm to destroy
+							scope.dialogBox.okButtonClickEvent();
+						}else{
+							// ask user to confirm if user ready to destroy crrent snippet
+							scope.destroySnippetEvent(scope.snippet.id);
+						}
+							
 					}
 				}else if( isKeyPressed(e, true, KeyEvent.KEY_B)) {
 					e.preventDefault();
@@ -592,11 +611,15 @@ angular.module('app.controllers',[])
 					}
 					loaded = false;
 				}else if( isKeyPressed(e, true, KeyEvent.KEY_DEL)) {
-					// Cmd + DEL
-					// 
+					//
+					// When user is able to modify the current snippet and able to delete it
+					// allow user to using Cmd + DEL to delete current snippet 
 					e.preventDefault();
 					if(scope.snippet.editable) {
-						scope.destroySnippetEvent(scope.snippet.id);	
+						
+						// ask user to confirm if user ready to destroy crrent snippet
+						scope.destroySnippetEvent(scope.snippet.id);
+							
 					}
 				}
 			}
@@ -708,6 +731,16 @@ var initialSnippet = function() {
 		content: "",
 		tags: []
 	};
+}
+
+// scrolling
+var scrollInListItem = function(_index) {
+	
+	var lists = document.querySelector("div.lists ul");
+	var items = lists.children;
+	lists.parentElement.scrollTop = items[_index].offsetTop;
+	
+	// console.log(items[1].offsetTop +' '+ lists.offsetTop +' '+ items[0].clientHeight);
 }
 
 var highlightText = function(element) {			  
