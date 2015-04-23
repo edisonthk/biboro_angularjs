@@ -36,6 +36,7 @@ angular.module('app.directives',['ngSanitize'])
 	    replace: true,
 	    template: '<div ng-bind-html="Converter.makeHtml(markdown_edit)"></div>',
 	    link: function (scope, ele, attrs) {
+	    	scope.markdown_edit = "";
 	    	scope.Converter = Converter;
 	    	var changed = false;
 	    	var myId = setInterval(function() {
@@ -46,6 +47,8 @@ angular.module('app.directives',['ngSanitize'])
 	    	}, 1000);
 
 	    	scope.$watch('markdown', function() {
+	    		console.log(scope.markdown);
+	    		scope.markdown_edit = scope.markdown || '';
 	    		// scope.markdown_edit = scope.markdown.replace(/</g, function(a, b) {
 	    		// 	return '&lt;';
 	    		// });
