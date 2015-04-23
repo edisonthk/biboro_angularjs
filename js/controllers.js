@@ -37,7 +37,10 @@ angular.module('app.controllers',[])
 		scope.user = User;
 		scope.symbol_cmd = symbol_cmd;
 		state.previous = null;
-		scope.searching = false;
+		scope.search = {
+			searching : false,
+			kw : "",
+		};
 
 		scope.snippetsRenderedCallback = function() {
 			for (var i = 0; i < scope.snippets.length; i++) {
@@ -65,16 +68,17 @@ angular.module('app.controllers',[])
 			return Http.get('/json/tag/?q='+encodeURIComponent(query));
 		};
 
-		var searching_offset_timeout;
-		scope.searchingEvent = function(kw) {
 
-			scope.kw = kw;
+		var searching_offset_timeout;
+		var searchingEvent = function() {
+
+			var kw = scope.search.kw;
 
 			// when there is change in searchbox, 
 			// reset the current index history keywords
 			reset_current_index_history_keywords();
 			if(kw && kw.length > 0){
-				scope.searching = true;
+				scope.search.searching = true;
 
 				// 
 				if(kw.match(/^[0-9]+$/)) {
@@ -89,7 +93,7 @@ angular.module('app.controllers',[])
 				searching_offset_timeout = setTimeout(function() {
 
 					if(kw.match(/^[0-9]+$/)) {
-						scope.searching = false;
+						scope.search.searching = false;
 						// if kw is number, do "selecting"
 						var _index = parseInt(kw) - 1;
 						if(_index < scope.snippets.length) {
@@ -99,7 +103,7 @@ angular.module('app.controllers',[])
 						// if kw not is number, do "searching"
 						Http.get('/json/search?kw='+encodeURIComponent(kw)).success(function(data) {
 							scope.snippets = data;
-							scope.searching = false;
+							scope.search.searching = false;
 							// $scope.last_searched_keywords = $scope.textbox.keywords;
 						});
 					}
@@ -108,6 +112,10 @@ angular.module('app.controllers',[])
 				}, 300);
 			}
 		};
+
+
+		scope.$watch("search.kw",searchingEvent);
+
 
 
 		scope.createSnippetEvent = function() {
@@ -305,13 +313,13 @@ angular.module('app.controllers',[])
 		var historyKwsManager = [];
 		var current_selected_history_keywords = -1;
 		var enterKeyUpCallback = function(e) {
-			if(scope.kw.length > 0 && !scope.kw.match(/^[0-9]+$/g)){
-				historyKwsManager.push(scope.kw);
-				scope.searchingEvent();
+			var kw = scope.search.kw;
+			if(kw.length > 0 && !kw.match(/^[0-9]+$/g)){
+				historyKwsManager.push(kw);
+				searchingEvent();
 			}
-			scope.kw = "";
+			scope.search.kw = "";
 			e.target.blur();
-
 		};
 
 		var reset_current_index_history_keywords = function() {
@@ -511,11 +519,10 @@ angular.module('app.controllers',[])
 					searchbox_input.blur();
 				}else if( isKeyPressed(e,false, KeyEvent.KEY_UP)) {
 					e.preventDefault();
-
 					// move to most recent history item
 					var _c = current_selected_history_keywords;
 					if(_c >= 0) {
-						scope.kw = historyKwsManager[_c];
+						scope.search.kw = historyKwsManager[_c];
 						_c -- ;
 						current_selected_history_keywords = _c;
 					}
@@ -527,7 +534,7 @@ angular.module('app.controllers',[])
 					var _c = current_selected_history_keywords;
 					if(_c < historyKwsManager.length - 1) {
 						_c ++ ;
-						scope.kw = historyKwsManager[_c];
+						scope.search.kw = historyKwsManager[_c];
 						current_selected_history_keywords = _c;
 					}
 

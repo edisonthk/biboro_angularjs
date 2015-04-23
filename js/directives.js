@@ -34,7 +34,7 @@ angular.module('app.directives',['ngSanitize'])
 	    	markdown: '=',
 	    },
 	    replace: true,
-	    template: '<div ng-bind-html="Converter.makeHtml(markdown)"></div>',
+	    template: '<div ng-bind-html="Converter.makeHtml(markdown_edit)"></div>',
 	    link: function (scope, ele, attrs) {
 	    	scope.Converter = Converter;
 	    	var changed = false;
@@ -46,6 +46,9 @@ angular.module('app.directives',['ngSanitize'])
 	    	}, 1000);
 
 	    	scope.$watch('markdown', function() {
+	    		scope.markdown_edit = scope.markdown.replace(/</g, function(a, b) {
+	    			return '&lt;';
+	    		});
 	    		changed = true;
 	    	});
 	    	

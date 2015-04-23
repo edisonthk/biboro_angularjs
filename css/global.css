@@ -572,6 +572,9 @@ dialog-box .error {
   text-align: left;
   font-size:14px;
 }
+.snippet_detail .content ul {
+  padding-left: 40px;
+}
 .snippet_detail .content pre.prettyprint{
   padding: 10px;
   margin: 0;
@@ -588,6 +591,9 @@ dialog-box .error {
 .snippet_detail share li{
   display: inline-block;
   font-size: 20px;
+}
+.snippet_detail .content img{
+  max-width: 100%;
 }
 .snippet_detail .ng-social {
   list-style-type: none;

@@ -18,13 +18,12 @@
 	<!-- Lists -->
 	<div class="lists">
 		<div class="searchbox">
-			<i ng-if="searching" class="fa fa-spinner fa-spin"></i>
-			<i ng-if="!searching" class="fa fa-search"></i>
+			<i ng-if="search.searching" class="fa fa-spinner fa-spin"></i>
+			<i ng-if="!search.searching" class="fa fa-search"></i>
 			<input 
 				id="searchbox_input"
-				ng-init="searchingElementLoaded()"  
-				ng-change="searchingEvent(kw)" 
-				ng-model="kw"
+				ng-init="searchingElementLoaded()"
+				ng-model="search.kw"
 				type="text" />
 		</div>
 		<ul>
