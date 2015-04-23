@@ -766,16 +766,16 @@ var initialSnippet = function() {
 // scrolling
 var scrollInListItem = function(_index) {
 	
-	var lists = document.querySelector("div.lists ul");
+	var lists = document.querySelector("div.lists ul.snippets-list");
 	var items = lists.children;
 	
 	// check if current item is visible in page or not
 	// if it is not visible in page, do scrollTop event
-	if(window.innerHeight < items[_index].getBoundingClientRect().bottom) {
-		lists.parentElement.scrollTop = items[_index].offsetTop;	
+	var selectedItemBottom = items[_index].getBoundingClientRect().bottom;
+	if(selectedItemBottom < 0 || lists.parentNode.clientHeight < selectedItemBottom) {
+		lists.scrollTop = items[_index].offsetTop;	
 	}
 	
-	// console.log(items[1].offsetTop +' '+ lists.offsetTop +' '+ items[0].clientHeight);
 }
 
 var highlightText = function(element) {			  
