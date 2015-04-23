@@ -46,9 +46,9 @@ angular.module('app.directives',['ngSanitize'])
 	    	}, 1000);
 
 	    	scope.$watch('markdown', function() {
-	    		scope.markdown_edit = scope.markdown.replace(/</g, function(a, b) {
-	    			return '&lt;';
-	    		});
+	    		// scope.markdown_edit = scope.markdown.replace(/</g, function(a, b) {
+	    		// 	return '&lt;';
+	    		// });
 	    		changed = true;
 	    	});
 	    	
