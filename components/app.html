@@ -17,31 +17,33 @@
 	<!-- ////////////////////////////////////////////// -->
 	<!-- Lists -->
 	<div class="lists">
-		<div class="searchbox">
-			<i ng-if="search.searching" class="fa fa-spinner fa-spin"></i>
-			<i ng-if="!search.searching" class="fa fa-search"></i>
-			<input 
-				id="searchbox_input"
-				ng-init="searchingElementLoaded()"
-				ng-model="search.kw"
-				type="text" />
+		<div style="position:relative;height: 100%;">
+			<div class="searchbox">
+				<i ng-if="search.searching" class="fa fa-spinner fa-spin"></i>
+				<i ng-if="!search.searching" class="fa fa-search"></i>
+				<input 
+					id="searchbox_input"
+					ng-init="searchingElementLoaded()"
+					ng-model="search.kw"
+					type="text" />
+			</div>
+			<ul class="snippets-list">
+				<li 
+					ng-repeat="_snippet in snippets" 
+					ng-class="{active: _snippet.id === selected_snippet_id}" 
+					on-finish-render="snippetsRenderedCallback" >
+					<a ui-sref="snippets.single({id:_snippet.id})">
+						<div class="index">{{$index + 1}}</div>
+						<div class="title">
+							{{_snippet.title}} <br />
+							<ul class="snippet_tags">
+								<li ng-repeat="_tag in _snippet.tags">{{_tag.name}}</li>
+							</ul>
+						</div>
+					</a>
+				</li>
+			</ul>
 		</div>
-		<ul>
-			<li 
-				ng-repeat="_snippet in snippets" 
-				ng-class="{active: _snippet.id === selected_snippet_id}" 
-				on-finish-render="snippetsRenderedCallback" >
-				<a ui-sref="snippets.single({id:_snippet.id})">
-					<div class="index">{{$index + 1}}</div>
-					<div class="title">
-						{{_snippet.title}} <br />
-						<ul class="snippet_tags">
-							<li ng-repeat="_tag in _snippet.tags">{{_tag.name}}</li>
-						</ul>
-					</div>
-				</a>
-			</li>
-		</ul>
 	</div>
 	
 	<!-- ////////////////////////////////////////////// -->

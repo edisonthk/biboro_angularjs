@@ -258,10 +258,16 @@ margin-top:50px;display:block;
   color: #dddddd;
 }
 
-.lists ul {padding-left:0px;}
+.lists ul {
+  padding-left:0px;
+}
+.lists ul.snippets-list {
+  position:absolute;top: 52px;bottom: 0px;overflow: scroll;
+  margin: 0;
+}
 
 .lists{ 
-  overflow: scroll;
+  overflow: none;
   position: fixed;
   top: 52px;
   bottom: 0;
