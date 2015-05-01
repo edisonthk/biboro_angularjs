@@ -1,9 +1,11 @@
 
 
-angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize'])
+angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize','angular-google-analytics'])
 
-	.config(['$locationProvider','$stateProvider', '$urlRouterProvider',function($locationProvider,$stateProvider, $urlRouterProvider){
+	.config(['$locationProvider','$stateProvider', '$urlRouterProvider','AnalyticsProvider',function($locationProvider,$stateProvider, $urlRouterProvider,AnalyticsProvider){
 
+		AnalyticsProvider.setAccount('UA-44036434-6');
+		
 		$stateProvider
 			.state('snippets',{
 				url: "/"
