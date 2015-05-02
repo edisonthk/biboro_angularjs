@@ -5,6 +5,14 @@ angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.ser
 	.config(['$locationProvider','$stateProvider', '$urlRouterProvider','AnalyticsProvider',function($locationProvider,$stateProvider, $urlRouterProvider,AnalyticsProvider){
 
 		AnalyticsProvider.setAccount('UA-44036434-6');
+        
+		// track all routes (or not)
+        AnalyticsProvider.trackPages(true);
+
+        // track all url query params (default is false)
+        AnalyticsProvider.trackUrlParams(true);
+
+        AnalyticsProvider.useAnalytics(true);
 		
 		$stateProvider
 			.state('snippets',{
