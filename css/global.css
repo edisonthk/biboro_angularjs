@@ -262,7 +262,7 @@ margin-top:50px;display:block;
   padding-left:0px;
 }
 .lists ul.snippets-list {
-  position:absolute;top: 52px;bottom: 0px;overflow-y: scroll;
+  position:absolute;top: 52px;bottom: 0px;overflow-y: scroll;width: 100%;
   margin: 0;
 }
 
