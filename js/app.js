@@ -1,18 +1,10 @@
 
 
-angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize','angular-google-analytics'])
+angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize','angularytics'])
 
-	.config(['$locationProvider','$stateProvider', '$urlRouterProvider','AnalyticsProvider',function($locationProvider,$stateProvider, $urlRouterProvider,AnalyticsProvider){
+	.config(['$locationProvider','$stateProvider', '$urlRouterProvider','AngularyticsProvider',function($locationProvider,$stateProvider, $urlRouterProvider,AngularyticsProvider){
 
-		AnalyticsProvider.setAccount('UA-44036434-6');
-        
-		// track all routes (or not)
-        AnalyticsProvider.trackPages(true);
-
-        // track all url query params (default is false)
-        AnalyticsProvider.trackUrlParams(true);
-
-        AnalyticsProvider.useAnalytics(true);
+		AngularyticsProvider.setEventHandlers(['Console', 'GoogleUniversal']);
 		
 		$stateProvider
 			.state('snippets',{
@@ -33,4 +25,8 @@ angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.ser
 
 
 		$locationProvider.html5Mode(!0).hashPrefix("!");
+	}])
+
+	.run(['Angularytics',function(Angularytics) {
+	    Angularytics.init();
 	}]);
