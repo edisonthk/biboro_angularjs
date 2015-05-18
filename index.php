@@ -3,11 +3,27 @@
 	<head>
 		<meta charset="utf-8">
 		<title>CodeGarage</title>
-		<meta name="description" content="">
-		<meta name="keywords" content="">
+		<meta name="description" content="{{$description}}">
+		<meta name="keywords" content="ソースコードの倉庫のことで、MBEDのC言語からAndroidのJava, ゲームのCPPなどソースコードであれば何でもありです。">
 
-		<link rel="icon" type="image/png" href="/img/icon@57x57.png" />
+		<link rel="icon" type="image/png" href="http://codegarage.edisonthk.com/img/icon@57x57.png" />
 		<base href="/_p/">
+
+		<?php if(isset($title)): ?>
+		<!-- Open Graph Protocol -->
+		<!-- Google Plus && Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="<?= $title ?>" />
+		<meta property="og:url" content="<?= $url ?>" />
+		<meta property="og:image" content="http://codegarage.edisonthk.com/img/icon@114x114.png" />
+		<meta property="og:description" content="<?= $description ?>" />
+
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="<?= $title ?>" />
+		<meta name="twitter:description" content="<?= $description ?>" />
+		<meta name="twitter:image" content="http://codegarage.edisonthk.com/img/icon@114x114.png" />
+		<meta name="twitter:url" content="<?= $url ?>" />
+		<?php endif;?>
 
 		<link rel="stylesheet" type="text/css" href="css/normalize.min.css">
 		<link rel="stylesheet" type="text/css" href="css/global.css">
@@ -31,10 +47,19 @@
 			<ng-include ng-controller="MyController" onload="onloadedEvent()" src="'components/app.html'"></ng-include>
 		</div>
 
-		<script type="text/javascript" src="bower_components/lodash/lodash.min.js"></script>
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		  ga('create', 'UA-44036434-6', 'auto');
+		  ga('send', 'pageview');
+
+		</script>
 		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
-		<!-- <script type="text/javascript" src="bower_components/angular-google-analytics/dist/angular-google-analytics.min.js"></script> -->
+		<script type="text/javascript" src="bower_components/angular-google-analytics/dist/angular-google-analytics.min.js"></script>
 		<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
 		<script type="text/javascript" src="bower_components/showdown/src/showdown.js"></script>
 		<script type="text/javascript" src="bower_components/ng-tags-input/ng-tags-input.js"></script>
