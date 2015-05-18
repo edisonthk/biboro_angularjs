@@ -95,6 +95,10 @@
 				<span>{{snippet.creator_name}}</span>
 				<span>{{snippet.updated_at}}</span>
 
+				<span ng-if="!isEditorPage()" class="split"></span>
+
+				<share ng-if="!isEditorPage()" title="snippet.title" description="minify(snippet.content)"></share>
+				
 			</div>
 
 			<div></div>
