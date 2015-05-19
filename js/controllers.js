@@ -6,7 +6,6 @@ angular.module('app.controllers',[])
 
 		scope.onloadedEvent = function() {
 			scope.loaded = true;
-			
 		};
 	}])
 	.controller('MyController', ['$scope','$rootScope','$state', '$stateParams','$http','Snippet','User','toaster','Feedback',
@@ -22,14 +21,7 @@ angular.module('app.controllers',[])
 
 		// 
 		// initial several variables
-		scope.snippets = Snippet.query(function() {
-			// for (var i = 0; i < scope.snippets.length; i++) {
-			// 	if(scope.snippets[i].id == stateParams.id) {
-			// 		scrollInListItem(i);
-			// 		break;		
-			// 	}
-			// };
-		});
+		scope.snippets = Snippet.query();
 		scope.modify_button_title = "編集";
 		scope.flag_editing = false;
 		scope.errors = null;
@@ -134,7 +126,7 @@ angular.module('app.controllers',[])
 
 			Snippet.create({}, _data , function(results) {
 				// new snippet is successfully created
-				scope.snippets.push(results);
+				scope.snippets.unshift(results);
 				state.go('snippets.single',{id: results.id});
 
 			}, function(results) {

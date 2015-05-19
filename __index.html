@@ -2,14 +2,15 @@
 <html lang="ja" ng-app="app">
 	<head>
 		<meta charset="utf-8">
-		<title>CodeGarage</title>
+		<base href="/_p/">
+		
+		<title><?= $title ?></title>
 		<meta name="description" content="{{$description}}">
 		<meta name="keywords" content="ソースコードの倉庫のことで、MBEDのC言語からAndroidのJava, ゲームのCPPなどソースコードであれば何でもありです。">
 
 		<link rel="icon" type="image/png" href="http://codegarage.edisonthk.com/img/icon@57x57.png" />
-		<base href="/_p/">
 
-		<?php if(isset($title)): ?>
+		
 		<!-- Open Graph Protocol -->
 		<!-- Google Plus && Facebook -->
 		<meta property="og:type" content="website" />
@@ -23,7 +24,7 @@
 		<meta name="twitter:description" content="<?= $description ?>" />
 		<meta name="twitter:image" content="http://codegarage.edisonthk.com/img/icon@114x114.png" />
 		<meta name="twitter:url" content="<?= $url ?>" />
-		<?php endif;?>
+		
 
 		<link rel="stylesheet" type="text/css" href="css/normalize.min.css">
 		<link rel="stylesheet" type="text/css" href="css/global.css">
