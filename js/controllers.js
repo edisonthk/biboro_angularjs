@@ -164,13 +164,6 @@ angular.module('app.controllers',[])
 					tags: _tags,
 				};
 
-				Toaster.pop({
-					type: 'info',
-	                body: '保存中 ...',
-	                showCloseButton: true
-				});
-				
-
 				Snippet.update({snippetId: snippet_id}, _data, function(results) {
 				
 					scope.errors = null;
@@ -180,7 +173,6 @@ angular.module('app.controllers',[])
 					Toaster.pop({
 						type: 'success',
 		                body: '保存しました',
-		                showCloseButton: true
 					});
 					
 				}, function(results){
@@ -189,6 +181,11 @@ angular.module('app.controllers',[])
 					for(var type in results.data.error) {
 						scope.errors.push(results.data.error[type][0]);
 					}
+
+					Toaster.pop({
+						type: 'error',
+		                body: '保存失敗',
+					});
 				});
 
 			}else{
