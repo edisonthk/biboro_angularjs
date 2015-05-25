@@ -13,6 +13,7 @@ angular.module('app.controllers',[])
 
 		scope.global = {};
 		scope.global.state = state;
+		scope.global.prefix_path = prefix_path;
 
 		var symbol_cmd = "Ctrl";
 		if(window.navigator.platform.indexOf("Mac") >= 0){
@@ -44,13 +45,17 @@ angular.module('app.controllers',[])
 		}
 
 		scope.loginedCallback = function(results) {
+			
 			if(results.error) {
 				// failed to login due to 
-				Toaster.pop({
-					type: 'info',
-	                body: '保存中 ...',
-	                showCloseButton: true
-				});
+				
+					Toaster.pop({
+						type: 'error',
+		                body: 'ログイン失敗：'+results.error,
+		                showCloseButton: true
+					});
+				scope.$apply();
+				
 			}else{
 				location.reload();
 			}
@@ -107,8 +112,6 @@ angular.module('app.controllers',[])
 
 
 		scope.$watch("search.kw",searchingEvent);
-
-
 
 		scope.createSnippetEvent = function() {
 			// new snippet
@@ -708,7 +711,6 @@ var loginEvent = function(cb) {
 	loginIntervalId = setInterval(function() {
 		try{
 			var url = win.document.URL;
-			console.log(url);
 			if(url.indexOf("/account/oauth2callback") >= 0){
 
 				var results = {};
@@ -736,7 +738,15 @@ var loginEvent = function(cb) {
 				}
 			}else if(url.indexOf("/account/success") >= 0){
 				
-				cb({});
+				if(url.indexOf("error=") >= 0) {
+					var error_message = "";
+					url.replace(/\?error\=(.*?)&?$/, function(m) {
+						error_message = m.replace(/\?error\=/g,"").replace(/#/g,"");
+					});
+					cb({error: error_message});
+				}else{
+					cb({});	
+				}
 
 				win.close();
 				clearInterval(loginIntervalId);

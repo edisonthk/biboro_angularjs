@@ -209,7 +209,7 @@ angular.module('app.directives',['ngSanitize'])
 				description: '=',
 				title: '='
 			},
-			templateUrl: 'components/share.html',
+			templateUrl: prefix_path + 'components/share.html',
 			link: function(scope, element, attrs){
 				scope.location = l;
 			}
