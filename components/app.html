@@ -35,7 +35,8 @@
 					<a ui-sref="snippets.single({id:_snippet.id})">
 						<div class="index">{{$index + 1}}</div>
 						<div class="title">
-							{{_snippet.title}} <br />
+							{{_snippet.title}} <small style="color: #888;">{{_snippet.score}}</small>
+                            <br />
 							<ul class="snippet_tags">
 								<li ng-repeat="_tag in _snippet.tags">{{_tag.name}}</li>
 							</ul>

@@ -35,10 +35,13 @@ angular.module('app.controllers',[])
 			kw : "",
 		};
 
+        var listInitializedFlag = false;
+
 		scope.snippetsRenderedCallback = function() {
 			for (var i = 0; i < scope.snippets.length; i++) {
 				if(scope.snippets[i].id == stateParams.id) {
 					scrollInListItem(i);
+                    listInitializedFlag = true;
 					break;		
 				}
 			};
@@ -99,7 +102,18 @@ angular.module('app.controllers',[])
 					}else{
 						// if kw not is number, do "searching"
 						Http.get('/json/search?kw='+encodeURIComponent(kw)).success(function(data) {
-							scope.snippets = data;
+
+                            // clean data
+                            var cleanData = [];
+                            for (var i = 0; i < data.length; i++) {
+                                var singleCleanData;
+
+                                singleCleanData = data[i].snippet;
+                                singleCleanData.score = data[i].score;
+                                cleanData.push(singleCleanData);
+
+                            };
+							scope.snippets = cleanData;
 							scope.search.searching = false;
 							// $scope.last_searched_keywords = $scope.textbox.keywords;
 						});
@@ -109,7 +123,6 @@ angular.module('app.controllers',[])
 				}, 300);
 			}
 		};
-
 
 		scope.$watch("search.kw",searchingEvent);
 
@@ -392,9 +405,9 @@ angular.module('app.controllers',[])
 			}
 
 			if(toParams.id){
-				scope.selected_snippet_id = toParams.id;
+				scope.selected_snippet_id = parseInt(toParams.id);
 
-				if(scope.isEditorPage()){
+				if(scope.isEditorPage()) {
 					// 
 					// state: snippets.single.editor
 					// 
@@ -419,15 +432,17 @@ angular.module('app.controllers',[])
 					// =========================
 
 					Snippet.get({snippetId: toParams.id}, function(data) {
+                        if(listInitializedFlag) {
+                            for (var i = 0; i < scope.snippets.length; i++) {
+                                if(scope.snippets[i].id == toParams.id) {
+                                    scrollInListItem(i);
+                                    break;      
+                                }
+                            };
 
-						for (var i = 0; i < scope.snippets.length; i++) {
-							if(scope.snippets[i].id == toParams.id) {
-								scrollInListItem(i);
-								break;		
-							}
-						};
+                        }
 						
-
+						
 						scope.snippet = filterServerSnippet( data );
 					}, function() {
 						// failed to retrieve snippet
