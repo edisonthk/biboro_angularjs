@@ -30,6 +30,11 @@ pre code, code {
   color: #fff;
   background-color:#333;
 }
+blockquote {
+    border-left: 4px solid #bbb;
+    margin-left: 0;
+    padding-left: 30px;
+}
 
 /* prettify dessert theme */
 code .str { color: #ffa0a0 } /* string  - pink */
@@ -366,6 +371,9 @@ margin-top:50px;display:block;
 .editor .input-group .markdown-help a:hover {
   cursor: pointer;
 }
+.editor .input-group .markdown-help{
+
+}
 .editor .input-group editor {
   display: block;
 }
@@ -416,22 +424,43 @@ editor .cover > div {
   line-height: 1.5;
 }
 
-.markdown_help th,.markdown_help td{
-  text-align: left;
-  width: 167px;
-  padding: 3px;
+.markdown_help > ul {
+    width: 100%;
+    list-style: none;
+    display: block;
 }
-.markdown_help {
-    border-collapse: collapse;
+.markdown_help > .form-control{
+    font-size: 14px;
+    padding: 3px;
     margin-bottom: 20px;
 }
+.markdown_help > ul > li{
+    float: left;
+    display: block;
+    width: 200px;
+    margin-right: 50px;
+    margin-bottom: 50px;
+}
 
-.markdown_help,.markdown_help th,.markdown_help td {
-    border: 1px solid #ccc;
+.markdown_help > ul > li > div {
+    width: 100%;
 }
-.markdown_help td {
-  font-weight: normal;
+.markdown_help > ul > li > div.md-title {
+    font-size: 18px;
+    margin-bottom: 10px;
 }
+.markdown_help > ul > li > div.md-desc {
+    font-size: 13px;
+    min-height: 160px;
+}
+.markdown_help > ul > li > div.md-desc > * { display: inline; }
+.markdown_help > ul > li > div.md-desc > img {border: 1px solid #ccc; }
+.markdown_help > ul > li > div.md-desc > .small-block { float: left; }
+.markdown_help > ul > li > div.md-desc > .small-block > ul {list-style-type: disc;}
+.markdown_help > ul > li > div.md-desc > .small-block > ul > li { 
+    display: list-item;
+    margin-left: 40px;
+ }
 
 /* Dialog CSS */ 
 dialog-box .dialog-background {
@@ -471,8 +500,8 @@ dialog-box .dialog {
   left: calc(50% - 325px);
 }
 dialog-box.markdown_help .dialog {
-  width: 350px;
-  left: calc(50% - 225px);
+    width: 760px;
+    left: calc(50% - 430px);
 }
 dialog-box .dialog small {
   color: inherit;  

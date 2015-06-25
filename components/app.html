@@ -1,6 +1,6 @@
 <div>
 	<header>
-		<div class="brand-name"><a ui-sref="snippets"><i class="fa fa-code fa-lg"></i> CODEGARAGE <small style="font-size:50%;">beta</small></a></div>
+		<div class="brand-name"><a ui-sref="snippets"><i class="fa fa-code fa-lg"></i> BIBORO <small style="font-size:50%;">beta</small></a></div>
 		<div class="nav-field">
 			<div class="clearfix">
 				<ul>
@@ -153,14 +153,11 @@
 		title="dialogBox.title" 
 		message="dialogBox.message" 
 		outside-clicked-event="dialogBox.outsideClickedEvent">
-
-		<div ng-if="dialogBox.type == 'markdown_help'">
-			<ng-include src="'components/markdown_help.html'"></ng-include>
-			<button 
-				class="btn btn-default"
-				ng-click="dialogBox.noButtonClickEvent()" 
-				ng-bind-html="dialogBox.noButtonText"></button>
-		</div>
+	
+		<ng-include 
+            ng-if="dialogBox.type == 'markdown_help'"
+            src="global.prefix_path+'components/markdown_help.html'">
+        </ng-include>		
 
 		<div ng-if="dialogBox.type == 'feedback'">
 			<p ng-if="dialogBox.error_message != null" class="error">{{dialogBox.error_message}}</p>

@@ -302,7 +302,7 @@ angular.module('app.controllers',[])
 				type: 'markdown_help',
 				feedback: true,
 				noButtonText: "閉じる",
-				title: '<i class="fa fa-question-circle"></i> マニュアル',
+				title: 'マークダウンの表記一覧表',
 				noButtonClickEvent: function() {
 					scope.dialogBox.show = false;
 				},
@@ -344,6 +344,7 @@ angular.module('app.controllers',[])
 		scope.minify = minifyContent;
 
 		var interval_draft_event = function() {
+            console.log("saving draft");
 			if(stateParams.id) {
 				saveDraft(stateParams.id);	
 			}else{
