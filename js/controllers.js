@@ -682,7 +682,7 @@ angular.module('app.controllers',[])
 		}
 
 		scope.fileUploadedCallback = function(success, msg, httpCode ) {
-			console.log(msg);
+			
 			if(Array.isArray(msg)){
 				scope.errors = [];
 				for (var i = 0; i < msg.length; i++) {
@@ -697,9 +697,6 @@ angular.module('app.controllers',[])
 			}
 			
 		};
-
-
-		
 	}]);
 
 // convert datatype stored in database to client AngularJS
@@ -765,7 +762,7 @@ var loginEvent = function(cb) {
 				clearInterval(loginIntervalId);
 			}
 		}catch(err){
-			console.log(err);
+			console.error(err);
 		}
 	}, 2000);
 };

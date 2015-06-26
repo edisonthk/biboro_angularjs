@@ -2,7 +2,7 @@
   "author": "revolunet",
   "name": "angular-google-analytics",
   "description": "Easy Analytics for your AngularJS application",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "homepage": "https://github.com/revolunet/angular-google-analytics",
   "repository": {
     "type": "git",
@@ -16,14 +16,13 @@
     "angular-mocks": ">=1",
     "angular-scenario": ">=1"
   },
-  "_release": "0.0.15",
+  "_release": "0.0.16",
   "_resolution": {
     "type": "version",
-    "tag": "0.0.15",
-    "commit": "966ec3a7752cfe6eb11c5649134bb07e21d1207c"
+    "tag": "0.0.16",
+    "commit": "532579b0a1cf7efeba28033c87d87c1d70195278"
   },
   "_source": "git://github.com/revolunet/angular-google-analytics.git",
   "_target": "~0.0.15",
-  "_originalSource": "angular-google-analytics",
-  "_direct": true
+  "_originalSource": "angular-google-analytics"
 }

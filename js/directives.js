@@ -26,7 +26,7 @@ var prettify = function(converter) {
 var Converter = new Showdown.converter({ extensions: [prettify] });
 
 
-angular.module('app.directives',['ngSanitize'])
+angular.module('app.directives',['ngSanitize','app.services'])
 	.directive('markdown', function ($compile) {
 	  return {
 	    restrict: 'A',
@@ -100,7 +100,8 @@ angular.module('app.directives',['ngSanitize'])
 			}
 		}
 	}])
-	.directive('editor', function() {
+	.directive('editor', ['FileUploader',function(FileUploader) {
+
 		return {
 			restrict: 'E',
 			require: '^ngModel',
@@ -109,7 +110,14 @@ angular.module('app.directives',['ngSanitize'])
 				readyToUploadCallback: '=',
 				uploadedCallback: '='
 			},
-			template: '<div class="clearfix"><div class="cover" ng-style="cover_styles"><div>Drop files here<br/>1MB以下</div></div><textarea ng-model="ngModel"></textarea></div>',
+			template: [
+                '<div class="clearfix">',
+                    '<div class="cover" ng-style="cover_styles">',
+                        '<div>Drop files here<br/>1MB以下</div>',
+                    '</div>',
+                    '<textarea ng-model="ngModel"></textarea>',
+                '</div>',
+            ].join(''),
 			link: function(scope, e, attrs) {
 		      	var textarea = e.find('textarea')[0];
 
@@ -137,71 +145,35 @@ angular.module('app.directives',['ngSanitize'])
 		      		_event.preventDefault();
 		      		
 		      		var files = _event.dataTransfer.files;
-		      		
-		      		var success = true;
-		      		var formData = new FormData();
-					for (var i = 0; i < files.length; i++) {
-						if(files[i].size > 1000000) {
-							success = false;
-							var data = {
-								errors : "ファイルサイズは1MB以下になります",
-							};
 
-							if(typeof scope.uploadedCallback !== 'undefined'){
-								scope.uploadedCallback(false, data, 413);
-							}
-							break;	
-						}
-					  	formData.append('files[]', files[i]);
-					}
+                    var cb = function(success, data, status) {
+                        
+                        if(success) {
+                            scope.ngModel = '\n\n';
 
-					if(success) {
-						// when success, AJAX send
-						var xhr = new XMLHttpRequest();
-						xhr.open('POST', '/json/images/upload');
-						xhr.onreadystatechange = function () {
-							if(xhr.readyState === 4) {
-								var res = xhr.responseText
-								try{
-									var data = JSON.parse(res);
-								  	if (xhr.status === 200) {
+                            if(Array.isArray(data)) {
+                                for (var i = 0; i < data.length; i++) {
+                                    scope.ngModel += "![alt text]("+data[i].message.destination_path+data[i].message.filename+")\n";
+                                }
+                            }else{
+                                scope.ngModel += "![alt text]("+data.message.destination_path+data.message.filename+")\n";  
+                            }
+                        }
 
-								  		scope.ngModel = '\n\n';
+                        if( typeof scope.uploadedCallback !== 'undefined'){
+                            scope.uploadedCallback(success, data, status);
+                        }
 
-								  		if(Array.isArray(data)) {
-								  			for (var i = 0; i < data.length; i++) {
-								  				scope.ngModel += "![alt text]("+data[i].message.destination_path+data[i].message.filename+")\n";
-								  			}
-								  			
-								  		}else{
-								  			scope.ngModel += "![alt text]("+data.message.destination_path+data.message.filename+")\n";	
-								  		}
-								  		
-								  		scope.$apply();
-								  		if(typeof scope.uploadedCallback !== 'undefined'){
-								  			scope.uploadedCallback(true, data, xhr.status);
-								  		}
-								  	} else {
-								  		// failed to uploaded
-								    	scope.uploadedCallback(false, data, xhr.status);
-								  	}
-								}catch(err) {
-									scope.uploadedCallback(false, err, xhr.status);
-								}
-							}
-						};
+                        scope.$apply();
+                    }
 
-						
-						xhr.send(formData);	
-					}
+                    FileUploader.upload('/json/images/upload', 'POST',files , cb);
 
-					scope.$apply();
-					
 		      		return false;
 		      	};
 		    }
 		};
-	})
+	}])
 	.directive('share', ['$location',function(l) {
 		return {
 			restrict: 'E',

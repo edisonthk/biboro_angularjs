@@ -2,7 +2,59 @@
 
 var user_info_in_factory = null;
 
-angular.module('app.services', ['ngResource'])
+angular.module('app.services', ['ngResource','ngCookies'])
+    .factory('FileUploader', ['$http','$cookies',function($http,$cookies) {
+
+        var maxSize = 1000000;
+
+        return {
+            setMaximumSize: function(maximumSize) {
+                maxSize = maximumSize;
+            },
+            upload: function(url, method, files, cb) {
+
+                if(typeof cb !== 'function') {
+                    cb = function() {};
+                }
+
+                var formData = new FormData();
+                for (var i = 0; i < files.length; i++) {
+                    if(files[i].size > maxSize) {
+                        var data = {
+                            errors : "ファイルサイズは1MB以下になります",
+                        };
+
+                        cb(false, data, 413);
+                        return;  
+                    }
+                    formData.append('files[]', files[i]);
+                }
+                    
+                var xhr = new XMLHttpRequest();
+                xhr.open(method.toUpperCase(), url);
+                xhr.setRequestHeader('X-XSRF-TOKEN',$cookies['XSRF-TOKEN'])
+                xhr.onreadystatechange = function () {
+                    if(xhr.readyState === 4) {
+                        var res = xhr.responseText
+                        try{
+                            var data = JSON.parse(res);
+                            if (xhr.status === 200) {
+                                cb(true, data, 200);
+                            } else {
+                                // failed to uploaded
+                                cb(false, data, xhr.status);
+                            }
+                        }catch(err) {
+                            console.error(err);
+                        }
+                    }
+                };
+
+                
+                xhr.send(formData);
+            }   
+        };
+    }])
     .factory('Snippet', ['$resource', function($resource){
 
       	// using $resource module

@@ -118,7 +118,7 @@
 		<div class='textbox-area'>
 
 			
-			<div ng-if="errors != null" class="errors-message">
+			<div ng-if="errors != null && errors.length > 0" class="errors-message">
 				<ul>
 					<li ng-repeat="err in errors">{{err}}</li>
 				</ul>

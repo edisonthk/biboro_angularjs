@@ -6,17 +6,16 @@
   ],
   "ignore": [],
   "dependencies": {
-    "angular": ">= 1.0.6"
+    "angular": ">= 1.3.0"
   },
   "homepage": "https://github.com/esvit/angular-social",
-  "_release": "3615d06db8",
+  "_release": "bddc5e2d05",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "3615d06db81e2e3e81425b99b5b5dc55ca0b3990"
+    "commit": "bddc5e2d05bb7a1b6cacea8da11ab11c77768062"
   },
   "_source": "git://github.com/esvit/angular-social.git",
   "_target": "master",
-  "_originalSource": "esvit/angular-social",
-  "_direct": true
+  "_originalSource": "esvit/angular-social"
 }

@@ -490,7 +490,7 @@ dialog-box .dialog-background {
 
 dialog-box .dialog {
   position: absolute;
-  padding: 10px 50px;
+  padding: 10px 0 10px 50px;
   background: white;
   border-radius: 5px;
   min-height: 180px;
