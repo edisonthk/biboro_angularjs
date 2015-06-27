@@ -14,7 +14,7 @@
             }
         }],
         "creator_name": "null",
-        "editable": false
+        "editable": true
     }, {
         "id": 2,
         "title": "fafaaaaaa",
@@ -30,7 +30,7 @@
             }
         }],
         "creator_name": "null",
-        "editable": false
+        "editable": true
     }, {
         "id": 3,
         "title": "bvcbvcbcbcvbvc",
@@ -46,7 +46,7 @@
             }
         }],
         "creator_name": "null",
-        "editable": false
+        "editable": true
     }, {
         "id": 4,
         "title": "fsdfasdf",

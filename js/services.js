@@ -88,8 +88,13 @@ angular.module('app.services', ['ngResource','ngCookies'])
     }])
     .factory('User', ['$http', function($http) {
 
+        var userinfoUrl = "/account/userinfo";
+        if(debug) {
+            userinfoUrl = "/json"+userinfoUrl+"/user.json";
+        }
+
       this._load = function() {
-        $http.get('/account/userinfo').success(function(data){
+        $http.get(userinfoUrl).success(function(data){
           // check if data is empty 
           if(data.email && data.id && data.name) {
             user_info_in_factory = data;
