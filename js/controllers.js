@@ -717,7 +717,7 @@ var minifyContent = function(content) {
 var loginIntervalId;
 var loginEvent = function(cb) {
 	
-	var win = window.open("/account/signin", "_blank", "width=300, height=400,modal=yes");
+	var win = window.open("/account/signin", "_blank");
 	loginIntervalId = setInterval(function() {
 		try{
 			var url = win.document.URL;
