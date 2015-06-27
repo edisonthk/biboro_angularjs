@@ -3,9 +3,11 @@
 angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize','angularytics'])
 
 	.config(['$locationProvider','$stateProvider', '$urlRouterProvider','AngularyticsProvider',function($locationProvider,$stateProvider, $urlRouterProvider,AngularyticsProvider){
-
-		AngularyticsProvider.setEventHandlers(['Console', 'GoogleUniversal']);
-		
+        
+        
+        AngularyticsProvider.setEventHandlers(['Console', 'GoogleUniversal']);        
+        
+        
 		$stateProvider
 			.state('snippets',{
 				url: "/"
@@ -31,5 +33,5 @@ angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.ser
 	}])
 
 	.run(['Angularytics',function(Angularytics) {
-	    Angularytics.init();
+        Angularytics.init();    
 	}]);
