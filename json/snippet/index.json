@@ -1,0 +1,131 @@
+[
+    {
+        "id": 1,
+        "title": "fsdfsd",
+        "updated_at": "3\u6642\u9593\u524d",
+        "tags": [{
+            "id": 183,
+            "name": "aaaaa",
+            "created_at": "2015-06-18 08:51:37",
+            "updated_at": "2015-06-18 08:51:37",
+            "pivot": {
+                "snippet_id": 371,
+                "tag_id": 183
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }, {
+        "id": 2,
+        "title": "fafaaaaaa",
+        "updated_at": "1\u65e5\u524d",
+        "tags": [{
+            "id": 17,
+            "name": "javascript",
+            "created_at": "2014-11-07 15:55:17",
+            "updated_at": "2014-11-07 15:55:17",
+            "pivot": {
+                "snippet_id": 372,
+                "tag_id": 17
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }, {
+        "id": 3,
+        "title": "bvcbvcbcbcvbvc",
+        "updated_at": "9\u65e5\u524d",
+        "tags": [{
+            "id": 182,
+            "name": "bbbbbbb",
+            "created_at": "2015-06-18 07:27:25",
+            "updated_at": "2015-06-18 07:27:25",
+            "pivot": {
+                "snippet_id": 370,
+                "tag_id": 182
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }, {
+        "id": 4,
+        "title": "fsdfasdf",
+        "updated_at": "9\u65e5\u524d",
+        "tags": [{
+            "id": 5,
+            "name": "aaa",
+            "created_at": "2014-10-27 21:56:52",
+            "updated_at": "2014-10-27 21:56:52",
+            "pivot": {
+                "snippet_id": 369,
+                "tag_id": 5
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }, {
+        "id": 5,
+        "title": "php\u306b\u304a\u3051\u308becho\u3068print\u306e\u9055\u3044",
+        "updated_at": "9\u65e5\u524d",
+        "tags": [{
+            "id": 13,
+            "name": "php",
+            "created_at": "2014-11-01 14:26:36",
+            "updated_at": "2014-11-01 14:26:36",
+            "pivot": {
+                "snippet_id": 366,
+                "tag_id": 13
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }, {
+        "id": 6,
+        "title": "php\u306e\u914d\u5217",
+        "updated_at": "10\u65e5\u524d",
+        "tags": [{
+            "id": 13,
+            "name": "php",
+            "created_at": "2014-11-01 14:26:36",
+            "updated_at": "2014-11-01 14:26:36",
+            "pivot": {
+                "snippet_id": 365,
+                "tag_id": 13
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }, {
+        "id": 7,
+        "title": "php\u306eif\u6587",
+        "updated_at": "10\u65e5\u524d",
+        "tags": [{
+            "id": 13,
+            "name": "php",
+            "created_at": "2014-11-01 14:26:36",
+            "updated_at": "2014-11-01 14:26:36",
+            "pivot": {
+                "snippet_id": 364,
+                "tag_id": 13
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }, {
+        "id": 8,
+        "title": "php\u3067Hello World!",
+        "updated_at": "10\u65e5\u524d",
+        "tags": [{
+            "id": 13,
+            "name": "php",
+            "created_at": "2014-11-01 14:26:36",
+            "updated_at": "2014-11-01 14:26:36",
+            "pivot": {
+                "snippet_id": 363,
+                "tag_id": 13
+            }
+        }],
+        "creator_name": "null",
+        "editable": false
+    }
+]
