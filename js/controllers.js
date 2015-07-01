@@ -415,7 +415,7 @@ angular.module('app.controllers',[])
 					// Editor page for modify exists snippet
 					// ===========================================
 					scope.errors = null;
-					scope.modify_button_title = "更新 <small>"+symbol_cmd+"+S</small>";
+					scope.modify_button_title = "保存 <small>"+symbol_cmd+"+S</small>";
 
 					Snippet.getEdit({snippetId: stateParams.id}, function(data) {
 						console.log(data.snippet);
