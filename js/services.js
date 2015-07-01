@@ -57,10 +57,20 @@ angular.module('app.services', ['ngResource','ngCookies'])
     }])
     .factory('Snippet', ['$resource', function($resource){
 
+        var queryParams = {snippetId: ''},
+            suffix = '';
+
+        if(debug) {
+            queryParams.snippetId = 'index';
+            suffix = '.json';
+        }else{
+
+        }
+
       	// using $resource module
       	// more details on https://docs.angularjs.org/api/ngResource/service/$resource
-      	return $resource('/json/snippet/:snippetId', {}, {
-          query: {method:'GET', params:{snippetId:''}, isArray:true},
+      	return $resource('/json/snippet/:snippetId'+suffix, {}, {
+          query: {method:'GET', params:queryParams, isArray:true},
           get: {method:'GET'},
           getCreate: {method: 'GET', url: '/json/snippet/create'}, 
           getEdit: {method: 'GET', url:'/json/snippet/:snippetId/edit'},
@@ -78,8 +88,13 @@ angular.module('app.services', ['ngResource','ngCookies'])
     }])
     .factory('User', ['$http', function($http) {
 
+        var userinfoUrl = "/account/userinfo";
+        if(debug) {
+            userinfoUrl = "/json"+userinfoUrl+"/user.json";
+        }
+
       this._load = function() {
-        $http.get('/account/userinfo').success(function(data){
+        $http.get(userinfoUrl).success(function(data){
           // check if data is empty 
           if(data.email && data.id && data.name) {
             user_info_in_factory = data;

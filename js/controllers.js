@@ -387,6 +387,8 @@ angular.module('app.controllers',[])
 			loaded = false;
 		scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
 
+            console.log("fsdfsdfsdfsd");
+
 			// if wrong pathing, correct the redirect. 
 			if(state.is('snippets.single')){
 				if(toParams.id.length <= 0) {
@@ -404,6 +406,8 @@ angular.module('app.controllers',[])
 			}else{
 				state.previous = null;
 			}
+
+
 
 			if(toParams.id){
 				scope.selected_snippet_id = parseInt(toParams.id);
