@@ -1,15 +1,9 @@
-# AngularJS Boilerplate
+# サーバー起動
+次の手順でウェブサイトを起動してください。
 
-It is **not official** AngularJS boilerplate, I used it for my personal purpose to accelerate developing of AngularJS application. 
+1. コマンドプロンプトを開いて、こちらのフォルダに移動してください。
+2. `php -S localhost:8000`とコマンドを実行してください。
+3. ブラウザを開いて[http://localhost:8000](http://localhost:8000)にアクセスしてください。
 
-This boilerplate including
-
-### Library
-* AngularJS - 1.3.*
-* angular-ui-router - 0.2.*
-
-### Sample code
-* minimal angularJS required 
-* ui-router `$stateChangeSuccess` event
-* commented `$locationProvider.html5mode(true)`
-* resource factory for API
+これで、起動が完了です。
+ハッピーコーディング
