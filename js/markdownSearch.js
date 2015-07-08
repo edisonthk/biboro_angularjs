@@ -7,9 +7,10 @@ angular.module("app.markdown",[])
                     '参照リンクに変えます。もしくは、' +
                     '画像をローカルからテキストに' +
                     'ドラッグ＆ドロップしてアップロード' +	
-                    'します。<br />'+
-                    '![myimg](img/link)',
-                tag:'<img width="50" src="https://d30y9cdsu7xlg0.cloudfront.net/png/30706-200.png">'
+                    'します。<br />',
+                    
+                tag:'![myimg](img/link)<br />'+
+                	'<img width="50" src="https://d30y9cdsu7xlg0.cloudfront.net/png/30706-200.png">'
 			},
 			{
 				title:'**太文字**',
@@ -76,7 +77,7 @@ angular.module("app.markdown",[])
 
 		var replaceAll=function(strBuffer,strBefore,strAfter){
 			return strBuffer.split(strBefore).join(strAfter);
-		}
+		};
 
 		//init $scope.mdConstList
 		var mdConstList= JSON.parse(JSON.stringify($scope.mdList));
@@ -96,4 +97,52 @@ angular.module("app.markdown",[])
 				$scope.mdList[i].description=replaceAll($scope.mdList[i].description,$scope.searchWord,str);
 			}
 		});
+		//define variable--------------------------------------
+
+        //element text
+        var text=document.getElementById("mdSearchBox");
+        //key config
+        var tempKey;
+        var keyEvent={
+            KEY_ESCAPE : 27,
+            KEY_0 : 48,
+            KEY_Z : 90,
+        };
+
+        //-----------------------------------------------------
+
+        //define function---------------------------------------------
+
+        //judge if the key I want is pressed
+        var judgePressedKey={
+            init:function(e){
+                tempKey=0;
+            },
+            //if any key is pressed or not
+            isAnyKeyPressed:function(e){
+                tempKey=e.keyCode;
+                if(keyEvent.KEY_0<=tempKey && tempKey<=keyEvent.KEY_Z){
+                    return true;
+                }
+                return false;
+            },
+        };
+
+        //key down 
+        var keydownFunc=function(e){
+            judgePressedKey.init(e);
+            if(judgePressedKey.isAnyKeyPressed(e)){
+                text.focus();
+            }
+        };
+
+        //------------------------------------------------------
+
+        //main function-------------------------------------------------
+
+        //if keydown
+        document.addEventListener("keydown",keydownFunc);
+
+
+        //-----------------------------------------------------
 	}]);
