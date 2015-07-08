@@ -5,7 +5,7 @@
 			<div class="clearfix">
 				<ul>
 					<li ng-if="!user.logined"><a ng-click="loginEvent(loginedCallback)">ログイン</a></li>
-					<li ng-if="user.logined"><a ng-click="newEvent()">保存 <small>{{symbol_cmd}}+B</small></a></li>
+					<li ng-if="user.logined"><a ng-click="newEvent()">新規作成 <small>{{symbol_cmd}}+B</small></a></li>
 					<li ng-if="user.logined"><a ng-click="logoutEvent()">ログアウト</a></li>
 					<li><a ng-click="feedbackEvent()">フィードバック</a></li>
 				</ul>
