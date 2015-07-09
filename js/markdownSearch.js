@@ -105,7 +105,6 @@ angular.module("app.markdown",[])
         //key config
         var keyBuf;
         var keyEvent={
-            KEY_ESCAPE : 27,
             KEY_0 : 48,
             KEY_Z : 90,
         };
@@ -116,7 +115,7 @@ angular.module("app.markdown",[])
 
         //judge if the key I want is pressed
         var judgePressedKey={
-            init:function(e){
+            init:function(){
                 keyBuf=0;
             },
             //if any key is pressed or not
