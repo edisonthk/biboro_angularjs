@@ -85,14 +85,15 @@ angular.module("app.markdown",[])
 		//if search-box is changed
 		$scope.$watch("searchWord",function(){
 			var str='<span class="match">'+$scope.searchWord+'</span>';
-			$scope.mdList= JSON.parse(JSON.stringify(mdConstList));
-			if(null==$scope.searchWord || ""==$scope.searchWord){
+			var i;
+            $scope.mdList= JSON.parse(JSON.stringify(mdConstList));
+			if(null===$scope.searchWord || ""===$scope.searchWord){
 				return;
 			}
-			for(var i=0;i<ngWord.length;i++){
+			for(i=0;i<ngWord.length;i++){
 				if(-1!=$scope.searchWord.indexOf(ngWord[i])){return;}
 			}
-			for(var i=0;i<$scope.mdList.length;i++){
+			for(i=0;i<$scope.mdList.length;i++){
 				$scope.mdList[i].title=replaceAll($scope.mdList[i].title,$scope.searchWord,str);
 				$scope.mdList[i].description=replaceAll($scope.mdList[i].description,$scope.searchWord,str);
 			}
@@ -102,7 +103,7 @@ angular.module("app.markdown",[])
         //element text
         var text=document.getElementById("mdSearchBox");
         //key config
-        var tempKey;
+        var keyBuf;
         var keyEvent={
             KEY_ESCAPE : 27,
             KEY_0 : 48,
@@ -116,12 +117,12 @@ angular.module("app.markdown",[])
         //judge if the key I want is pressed
         var judgePressedKey={
             init:function(e){
-                tempKey=0;
+                keyBuf=0;
             },
             //if any key is pressed or not
             isAnyKeyPressed:function(e){
-                tempKey=e.keyCode;
-                if(keyEvent.KEY_0<=tempKey && tempKey<=keyEvent.KEY_Z){
+                keyBuf=e.keyCode;
+                if(keyEvent.KEY_0<=keyBuf && keyBuf<=keyEvent.KEY_Z){
                     return true;
                 }
                 return false;
