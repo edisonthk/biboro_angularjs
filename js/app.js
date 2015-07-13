@@ -1,6 +1,6 @@
 
 
-angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize','angularytics'])
+angular.module('app',['ui.router', 'app.controllers', 'app.directives', 'app.services','ngTagsInput','ngSocial', 'toaster','ngSanitize','angularytics','app.markdown'])
 
 	.config(['$locationProvider','$stateProvider', '$urlRouterProvider','AngularyticsProvider',function($locationProvider,$stateProvider, $urlRouterProvider,AngularyticsProvider){
         
