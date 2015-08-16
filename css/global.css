@@ -438,6 +438,7 @@ editor .cover > div {
     float: left;
     display: block;
     width: 200px;
+    height: 190px;
     margin-right: 50px;
     margin-bottom: 50px;
 }
@@ -451,13 +452,16 @@ editor .cover > div {
 }
 .markdown_help > ul > li > div.md-desc {
     font-size: 13px;
-    min-height: 160px;
 }
-.markdown_help > ul > li > div.md-desc > * { display: inline; }
-.markdown_help > ul > li > div.md-desc > img {border: 1px solid #ccc; }
-.markdown_help > ul > li > div.md-desc > .small-block { float: left; }
-.markdown_help > ul > li > div.md-desc > .small-block > ul {list-style-type: disc;}
-.markdown_help > ul > li > div.md-desc > .small-block > ul > li { 
+.markdown_help > ul > li > div.md-tag {
+    margin-top: 15px;
+    font-size: 13px;
+}
+.markdown_help > ul > li > div.md-tag > * { display: inline; }
+.markdown_help > ul > li > div.md-tag > img {border: 1px solid #ccc; }
+.markdown_help > ul > li > div.md-tag > .small-block { float: left; }
+.markdown_help > ul > li > div.md-tag > .small-block > ul {list-style-type: disc;}
+.markdown_help > ul > li > div.md-tag > .small-block > ul > li { 
     display: list-item;
     margin-left: 40px;
  }

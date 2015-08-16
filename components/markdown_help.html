@@ -1,15 +1,15 @@
 <div class="markdown_help">
     
-    <input class="form-control" type="text" placeholder="検索はこちら" ng-model="searchWord">
-    
+    <input id="mdSearchBox" class="form-control" type="text" placeholder="検索はこちら" ng-model="searchWord" >
+
 </div>
 
-<div ng-controller="markdownCtrl" class="markdown_help clearfix">
+<div ng-controller="markdownCtrl" class="markdown_help clearfix">   
     <ul>
         <li ng-repeat="md in mdList | filter:searchWord">
             <div class="md-title" ng-bind-html="md.title"></div>
             <div class="md-desc" ng-bind-html="md.description"></div>
-            <div class="md-desc" ng-bind-html="md.tag"></div>
+            <div class="md-tag" ng-bind-html="md.tag"></div>
         </li>     
     </ul>
 </div>
